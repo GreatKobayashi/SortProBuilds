@@ -1,6 +1,4 @@
-﻿using RiotApiController.Domain.Entities;
-
-namespace RiotApiController.Domain.Repositories
+﻿namespace RiotApiController.Domain.Repositories
 {
     public interface IDatabaseAccessRepository
     {

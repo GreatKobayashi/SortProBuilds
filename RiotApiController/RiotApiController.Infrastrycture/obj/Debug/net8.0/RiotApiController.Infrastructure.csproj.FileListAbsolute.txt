@@ -18,3 +18,4 @@ C:\Users\kobay\source\repos\DefeatYourOpponent\RiotApiController\RiotApiControll
 C:\Users\kobay\source\repos\DefeatYourOpponent\RiotApiController\RiotApiController.Infrastrycture\obj\Debug\net8.0\refint\RiotApiController.Infrastructure.dll
 C:\Users\kobay\source\repos\DefeatYourOpponent\RiotApiController\RiotApiController.Infrastrycture\obj\Debug\net8.0\RiotApiController.Infrastructure.pdb
 C:\Users\kobay\source\repos\DefeatYourOpponent\RiotApiController\RiotApiController.Infrastrycture\obj\Debug\net8.0\ref\RiotApiController.Infrastructure.dll
+C:\Users\kobay\source\repos\DefeatYourOpponent\RiotApiController\RiotApiController.Infrastrycture\obj\Debug\net8.0\RiotApiController.Infrastructure.sourcelink.json

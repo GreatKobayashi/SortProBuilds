@@ -1,36 +1,43 @@
 ﻿using RiotApiController.Domain.Entities;
 using RiotSharp.Misc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RiotApiController.Domain.Repositories
 {
     public class GameResultRepository
     {
-        private IGameResultRepository _matchResultRepository;
+        private IGameResultRepository _gameResultRepository;
 
-        public GameResultRepository(IGameResultRepository matchResultRepository)
+        public GameResultRepository(IGameResultRepository gameResultRepository)
         {
-            _matchResultRepository = matchResultRepository;
+            _gameResultRepository = gameResultRepository;
         }
 
-        public async Task<List<GameResultEntity>> GetMatchDataAsync(long count, Region region, string puuId, Dictionary<string, string> tagKeyAndValuePairs)
+        public async Task<List<GameResultEntity>> GetGameResultAsync(long count, Region region, string puuId, Dictionary<string, string> tagKeyAndValuePairs)
         {
-            var matchList = await _matchResultRepository.GetMatchDataAsync(count, region, puuId);
             var tagEntity = new TagEntity(tagKeyAndValuePairs);
 
             var matchedGameList = new List<GameResultEntity>();
-            foreach (var match in matchList)
+            var start = 0;
+            do
             {
-                if (tagEntity.IsMatch(match))
+                var gameList = await _gameResultRepository.GetGameResultAsync(start, count, region, puuId);
+                foreach (var game in gameList)
                 {
-                    matchedGameList.Add(match);
+                    if (tagEntity.IsMatch(game))
+                    {
+                        matchedGameList.Add(game);
+                    }
                 }
+                start += 10;
             }
-            return matchedGameList;
+            while (matchedGameList.Count < count);
+
+            return matchedGameList.Take((int)count).ToList();
+        }
+
+        public async Task<string> GetPuuidAsync(Region region, string summonerName)
+        {
+            return await _gameResultRepository.GetPuuidAsync(region, summonerName);
         }
     }
 }

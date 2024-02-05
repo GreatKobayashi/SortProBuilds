@@ -18,7 +18,7 @@ namespace RiotApiController.Infrastructure
             return new SettingFileJson();
         }
 
-        public static IGameResultRepository CreateMatchResultRepository(RiotApi riotApi)
+        public static IGameResultRepository CreateGameResultRepository(RiotApi riotApi)
         {
             return new RiotApiWrapper(riotApi);
         }

@@ -1,4 +1,5 @@
 ﻿using RiotApiController.Domain.Entities;
+using RiotApiController.Domain.Logics;
 using RiotApiController.Domain.Repositories;
 using RiotSharp;
 using RiotSharp.Misc;
@@ -14,9 +15,10 @@ namespace RiotApiController.Infrastructure.WebApi
             _riotApi = riotApi;
         }
 
-        public async Task<List<GameResultEntity>> GetMatchDataAsync(long count, Region region, string puuId)
+        public async Task<List<GameResultEntity>> GetGameResultAsync(long start, long count, Region region, string puuId)
         {
-            var matchList = await _riotApi.Match.GetMatchListAsync(region, puuId, 0, count);
+            region = region.ToArea();
+            var matchList = await _riotApi.Match.GetMatchListAsync(region, puuId, start, count);
             var matchResultEntityList = new List<GameResultEntity>();
             foreach (var matchId in matchList)
             {
@@ -33,10 +35,29 @@ namespace RiotApiController.Infrastructure.WebApi
                 {
                     win = match.Info.Teams[1].Win;
                 }
+                var opponentChampion = match.Info.Participants.Find(p => p.TeamPosition == playerInfo.TeamPosition &&
+                    p.TeamId != playerInfo.TeamId);
+#pragma warning disable CS8602
                 matchResultEntityList.Add(new(
-                    playerInfo.ChampionName, win, playerInfo.TeamPosition));
+                    match.Info.QueueId,
+                    playerInfo.ChampionName,
+                    win,
+                    playerInfo.TeamPosition,
+                    opponentChampion.ChampionName,
+                    new List<long>()
+                    {
+                        playerInfo.Item0, playerInfo.Item1, playerInfo.Item2, playerInfo.Item3, playerInfo.Item4, playerInfo.Item5, playerInfo.Item6
+                    },
+                    playerInfo.Kills, playerInfo.Deaths, playerInfo.Assists));
+#pragma warning restore CS8602
             }
             return matchResultEntityList;
+        }
+
+        public async Task<string> GetPuuidAsync(Region region, string summonerName)
+        {
+            var summoner = await _riotApi.Summoner.GetSummonerByNameAsync(region, summonerName);
+            return summoner.Puuid;
         }
     }
 }

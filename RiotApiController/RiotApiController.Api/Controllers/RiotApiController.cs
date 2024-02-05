@@ -1,17 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RiotApiController.Domain.Entities;
+using RiotApiController.Domain.Misc.Commons;
 using RiotApiController.Domain.Repositories;
 using RiotApiController.Infrastructure;
 using RiotSharp;
-using RiotSharp.Misc;
 using System.Text.Json;
 
 namespace RiotApiController.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api")]
     [ApiController]
     public class RiotApiController : ControllerBase
     {
-        private string _apiKey = "RGAPI-7757f625-5630-414e-a6ec-c7cf76fadaef";
+        private string _apiKey = "RGAPI-c6c222ac-b393-49cd-a064-bae780a84d24";
 
         // Duster PuuID
         private string _puuId = "1YJ96H5Z9Gy7XVs-KlceM--D_GdxTmReFllNRQjdZPMNrcnJDTnBM3_c9SJ9oenNQTJL4i5vtbI7tg";
@@ -21,31 +22,23 @@ namespace RiotApiController.Api.Controllers
         public RiotApiController()
         {
             var api = RiotApi.GetDevelopmentInstance(_apiKey);
-            _gameResultRepository = new GameResultRepository(Factories.CreateMatchResultRepository(api));
+            _gameResultRepository = new GameResultRepository(Factories.CreateGameResultRepository(api));
         }
 
-        [HttpGet]
-        public async Task<string> GetMatchData()
+        [Route("GetGameResult")]
+        [HttpPost]
+        public async Task<string> GetGameResultAsync(RiotApiGetGameResultRequestBody requestBody)
         {
             try
             {
-                var testTag = new Dictionary<string, string>()
-                {
-                    { "Position", "MIDDLE" }
-                };
-                var gameList = await _gameResultRepository.GetMatchDataAsync(10, Region.Asia, _puuId, testTag);
+                var puuid = await _gameResultRepository.GetPuuidAsync(requestBody.Region, requestBody.SummonerName);
+                var gameList = await _gameResultRepository.GetGameResultAsync(10, requestBody.Region, puuid, requestBody.Tags);
                 return JsonSerializer.Serialize(gameList);
             }
             catch (RiotSharpException)
             {
                 throw;
             }
-        }
-
-        [HttpPost]
-        public void PostAddPlayerData()
-        {
-
         }
     }
 }

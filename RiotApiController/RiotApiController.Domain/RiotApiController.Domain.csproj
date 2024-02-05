@@ -11,8 +11,4 @@
     <PackageReference Include="RiotSharp" Version="5.0.0-alpha" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Logics\" />
-  </ItemGroup>
-
 </Project>

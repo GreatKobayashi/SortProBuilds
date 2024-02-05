@@ -1,11 +1,9 @@
-﻿using RiotSharp.Misc;
-
-namespace RiotApiController.Domain.Entities
+﻿namespace RiotApiController.Domain.Entities
 {
     public class TagEntity
     {
-        public string? Champion {  get; set; }
-        public bool? Win {  get; set; }
+        public string? Champion { get; set; }
+        public bool? Win { get; set; }
         public string? Position { get; set; }
 
         public TagEntity(Dictionary<string, string> tagKeyValuePairs)

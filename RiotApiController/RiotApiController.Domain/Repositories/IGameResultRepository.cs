@@ -5,6 +5,7 @@ namespace RiotApiController.Domain.Repositories
 {
     public interface IGameResultRepository
     {
-        public Task<List<GameResultEntity>> GetMatchDataAsync(long count, Region region, string puuId);
+        public Task<List<GameResultEntity>> GetGameResultAsync(long start, long count, Region region, string puuId);
+        public Task<string> GetPuuidAsync(Region region, string summonerName);
     }
 }
