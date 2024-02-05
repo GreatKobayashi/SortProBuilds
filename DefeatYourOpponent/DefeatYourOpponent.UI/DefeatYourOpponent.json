@@ -1,0 +1,8 @@
+{
+  "RiotControllerSetting": {
+    "BaseUrl": "https://localhost:7058",
+    "ApiUrls": {
+      "GetGameResult": "api/GetGameResult"
+    }
+  }
+}

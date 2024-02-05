@@ -1,0 +1,37 @@
+﻿@page "/"
+@using DefeatYourOpponent.Domain.Entities.Commons
+@using DefeatYourOpponent.Domain.Repositories
+@rendermode InteractiveServer
+@inject IGameResultRepository GameResultRepository
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+<form @onsubmit=SerchBySummonerName class="input-group mb-3">
+    <input class="form-control" @bind="_enteredSummonerName" />
+    <div class="input-group-append">
+        <button class="btn btn-primary" type="button" @onclick="SerchBySummonerName">GO</button>
+    </div>
+</form>
+
+<table>
+    @foreach (var game in _gameResultEntities)
+    {
+        <tr>
+            @game.Champion
+        </tr>
+    }
+</table>
+
+@code{
+    private List<GameResultEntity> _gameResultEntities = new List<GameResultEntity>();
+    private string? _enteredSummonerName;
+
+    private async void SerchBySummonerName()
+    {
+        _gameResultEntities = await GameResultRepository.GetGameResultEntitiesAsync();
+        StateHasChanged();
+    }
+}
