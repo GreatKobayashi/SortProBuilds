@@ -20,16 +20,13 @@ namespace DefeatYourOpponent.Infrastructure.WebApi
             };
         }
 
-        public async Task<List<GameResultEntity>> GetGameResultEntitiesAsync()
+        public async Task<List<GameResultEntity>> GetGameResultEntitiesAsync(string summonerName, Dictionary<string, string> tags)
         {
             var testRequest = new RiotApiGetGameResultRequestBody()
             {
                 Region = Region.Jp,
-                SummonerName = "Duster",
-                Tags = new Dictionary<string, string>()
-                {
-                    { "Position", Position.MIDDLE.ToString() }
-                }
+                SummonerName = summonerName,
+                Tags = tags
             };
 
             var response = await _httpClient.PostAsJsonAsync(
