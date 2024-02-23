@@ -1,7 +1,7 @@
-﻿using RiotApiController.Domain.Entities;
+﻿using DefeatYourOpponent.Domain.Entities;
 using System.Text.Json.Serialization;
 
-namespace RiotApiController.Domain
+namespace DefeatYourOpponent.Domain
 {
     public static class Shared
     {

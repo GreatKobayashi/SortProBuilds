@@ -1,15 +1,17 @@
-﻿using RiotApiController.Domain.Entities;
+﻿using DefeatYourOpponent.Domain.Entities;
 using RiotApiController.Domain.Helper;
 
-namespace RiotApiController.Infrastructure.Json
+namespace DefeatYourOpponent.Infrastructure.Json
 {
     public class SettingFileJson : ISettingFileRepository
     {
+        private string _settingFileName = "DefeatYourOpponent.json";
+
         public SettingEntity GetEntity()
         {
             try
             {
-                return JsonSerializerHelper.Deserialize<SettingEntity>("DefeatYourOpponent.json");
+                return JsonSerializerHelper.Deserialize<SettingEntity>(_settingFileName, FileAccess.Read);
             }
             catch (Exception ex)
             {

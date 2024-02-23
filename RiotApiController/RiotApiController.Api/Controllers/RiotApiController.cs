@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RiotApiController.Domain.Entities;
-using RiotApiController.Domain.Misc.Commons;
+using RiotApiController.Domain.Entities.Commons;
 using RiotApiController.Domain.Repositories;
 using RiotApiController.Infrastructure;
 using RiotSharp;
+using System.Net;
 using System.Text.Json;
 
 namespace RiotApiController.Api.Controllers
@@ -12,10 +12,7 @@ namespace RiotApiController.Api.Controllers
     [ApiController]
     public class RiotApiController : ControllerBase
     {
-        private string _apiKey = "RGAPI-c6c222ac-b393-49cd-a064-bae780a84d24";
-
-        // Duster PuuID
-        private string _puuId = "1YJ96H5Z9Gy7XVs-KlceM--D_GdxTmReFllNRQjdZPMNrcnJDTnBM3_c9SJ9oenNQTJL4i5vtbI7tg";
+        private string _apiKey = "RGAPI-25bb0231-8b74-4d0c-8c6a-785a4cd93e26";
 
         private GameResultRepository _gameResultRepository;
 
@@ -25,9 +22,9 @@ namespace RiotApiController.Api.Controllers
             _gameResultRepository = new GameResultRepository(Factories.CreateGameResultRepository(api));
         }
 
-        [Route("GetGameResult")]
+        [Route("PostTakeGameResult")]
         [HttpPost]
-        public async Task<string> GetGameResultAsync(RiotApiGetGameResultRequestBody requestBody)
+        public async Task<string> PostTakeGameResultAsync(RiotApiGetGameResultRequestBody requestBody)
         {
             try
             {
@@ -38,6 +35,10 @@ namespace RiotApiController.Api.Controllers
             catch (RiotSharpException)
             {
                 throw;
+            }
+            catch (Exception ex)
+            {
+                throw new RiotSharpException(ex.Message, HttpStatusCode.InternalServerError);
             }
         }
     }

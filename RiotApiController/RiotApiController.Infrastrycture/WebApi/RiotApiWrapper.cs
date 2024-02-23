@@ -1,4 +1,4 @@
-﻿using RiotApiController.Domain.Entities;
+﻿using RiotApiController.Domain.Entities.Commons;
 using RiotApiController.Domain.Logics;
 using RiotApiController.Domain.Repositories;
 using RiotSharp;
@@ -46,8 +46,9 @@ namespace RiotApiController.Infrastructure.WebApi
                     opponentChampion.ChampionName,
                     new List<long>()
                     {
-                        playerInfo.Item0, playerInfo.Item1, playerInfo.Item2, playerInfo.Item3, playerInfo.Item4, playerInfo.Item5, playerInfo.Item6
+                        playerInfo.Item0, playerInfo.Item1, playerInfo.Item2, playerInfo.Item3, playerInfo.Item4, playerInfo.Item5
                     },
+                    playerInfo.Item6,
                     playerInfo.Kills, playerInfo.Deaths, playerInfo.Assists));
 #pragma warning restore CS8602
             }

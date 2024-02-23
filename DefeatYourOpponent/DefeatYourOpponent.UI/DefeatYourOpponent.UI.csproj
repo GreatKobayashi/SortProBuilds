@@ -11,4 +11,10 @@
     <ProjectReference Include="..\DefeatYourOpponent.Infrastructure\DefeatYourOpponent.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Data\champion.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

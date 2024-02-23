@@ -1,4 +1,4 @@
-﻿namespace RiotApiController.Domain.Entities
+﻿namespace DefeatYourOpponent.Domain.Entities
 {
     public interface ISettingFileRepository
     {

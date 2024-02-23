@@ -1,4 +1,4 @@
-﻿using RiotApiController.Domain.Entities;
+﻿using RiotApiController.Domain.Entities.Commons;
 using RiotSharp.Misc;
 
 namespace RiotApiController.Domain.Repositories
@@ -12,10 +12,8 @@ namespace RiotApiController.Domain.Repositories
             _gameResultRepository = gameResultRepository;
         }
 
-        public async Task<List<GameResultEntity>> GetGameResultAsync(long count, Region region, string puuId, Dictionary<string, string> tagKeyAndValuePairs)
+        public async Task<List<GameResultEntity>> GetGameResultAsync(long count, Region region, string puuId, TagEntity tags)
         {
-            var tagEntity = new TagEntity(tagKeyAndValuePairs);
-
             var matchedGameList = new List<GameResultEntity>();
             var start = 0;
             do
@@ -23,14 +21,14 @@ namespace RiotApiController.Domain.Repositories
                 var gameList = await _gameResultRepository.GetGameResultAsync(start, count, region, puuId);
                 foreach (var game in gameList)
                 {
-                    if (tagEntity.IsMatch(game))
+                    if (tags.IsMatch(game))
                     {
                         matchedGameList.Add(game);
                     }
                 }
                 start += 10;
             }
-            while (matchedGameList.Count < count);
+            while (matchedGameList.Count < count && start / 10 < Shared.SettingEntity.MaxTryCount);
 
             return matchedGameList.Take((int)count).ToList();
         }

@@ -1,5 +1,6 @@
-﻿using RiotApiController.Domain.Helper;
-using System.Text.Json;
+﻿using DefeatYourOpponent.Domain.Entities.Commons;
+using RiotApiController.Domain.Helper;
+using RiotSharp;
 
 namespace DefeatYourOpponent.Domain.Logics
 {
@@ -7,16 +8,16 @@ namespace DefeatYourOpponent.Domain.Logics
     {
         public static Type Convert<Type>(HttpResponseMessage response)
         {
+            var responseBody = response.Content.ReadAsStringAsync().Result;
             try
             {
-                var responseBody = response.Content.ReadAsStringAsync().Result;
-#pragma warning disable CS8603
-                return JsonSerializer.Deserialize<Type>(responseBody);
-#pragma warning restore CS8603
+                response.EnsureSuccessStatusCode();
+                return JsonSerializerHelper.Deserialize<Type>(responseBody);
             }
-            catch (Exception ex)
+            catch
             {
-                throw new Exception("HTTPレスポンス不正", ex);
+                var errorResponseBody = JsonSerializerHelper.Deserialize<RiotApiErrorResponseBody>(responseBody);
+                throw new RiotSharpException(errorResponseBody.Message, errorResponseBody.HttpStatusCode);
             }
         }
     }

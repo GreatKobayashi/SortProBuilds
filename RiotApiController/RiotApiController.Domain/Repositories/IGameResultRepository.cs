@@ -1,4 +1,4 @@
-﻿using RiotApiController.Domain.Entities;
+﻿using RiotApiController.Domain.Entities.Commons;
 using RiotSharp.Misc;
 
 namespace RiotApiController.Domain.Repositories

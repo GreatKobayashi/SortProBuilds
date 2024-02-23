@@ -4,6 +4,6 @@ namespace DefeatYourOpponent.Domain.Repositories
 {
     public interface IGameResultRepository
     {
-        public Task<List<GameResultEntity>> GetGameResultEntitiesAsync(string summonerName, Dictionary<string, string> tags);
+        public Task<List<GameResultEntity>> GetGameResultEntitiesAsync(string summonerName, TagEntity tags, int count);
     }
 }

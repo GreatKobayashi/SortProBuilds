@@ -1,17 +1,21 @@
-﻿using RiotSharp.Misc;
+﻿using DefeatYourOpponent.Domain.Entities.Commons;
+using RiotSharp.Misc;
 
-namespace DefeatYourOpponent.Domain.Entities.Commons
+namespace DefeatYourOpponent.Domain.Entities
 {
     public class RiotApiGetGameResultRequestBody
     {
-        public Region Region { get; set; }
-        public string SummonerName { get; set; }
-        public Dictionary<string, string> Tags { get; set; }
+        public Region Region { get; }
+        public string SummonerName { get; }
+        public TagEntity Tags { get; }
+        public int Count { get; }
 
-        public RiotApiGetGameResultRequestBody()
+        public RiotApiGetGameResultRequestBody(Region region, string summonerName, TagEntity tags, int count)
         {
-            SummonerName = string.Empty;
-            Tags = new Dictionary<string, string>();
+            Region = region;
+            SummonerName = summonerName;
+            Tags = tags;
+            Count = count;
         }
     }
 }

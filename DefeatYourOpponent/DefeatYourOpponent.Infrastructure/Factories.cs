@@ -1,10 +1,10 @@
-﻿using DefeatYourOpponent.Domain.Repositories;
+﻿using DefeatYourOpponent.Domain.Entities;
+using DefeatYourOpponent.Domain.Logics;
+using DefeatYourOpponent.Domain.Repositories;
+using DefeatYourOpponent.Infrastructure.Json;
 using DefeatYourOpponent.Infrastructure.WebApi;
-using RiotApiController.Domain.Entities;
-using RiotApiController.Infrastructure.Json;
-using RiotSharp;
 
-namespace RiotApiController.Infrastructure
+namespace DefeatYourOpponent.Infrastructure
 {
     public static class Factories
     {
@@ -16,6 +16,23 @@ namespace RiotApiController.Infrastructure
         public static IGameResultRepository CreateGameResultRepository()
         {
             return new RiotControllerWebApi();
+        }
+
+        public static IErrorMessageConverterRepository CreateErrorMessageConverterRespository(
+            string riotApiErrorMessagelistFilePath, string internalErrorMessagelistFilePath)
+        {
+            return new ErrorMessageConverterJson(riotApiErrorMessagelistFilePath, internalErrorMessagelistFilePath);
+        }
+
+        public static IChampionsDataRepository CreateChampionsDataRepository(string championsDataFilePath)
+        {
+            return new ChampionsDataJson(championsDataFilePath);
+        }
+
+        public static IRiotDataConverterRepository CreateRiotDataConverterRepository(
+            string queueIdListFilePath)
+        {
+            return new RiotDataConverterJson(queueIdListFilePath);
         }
     }
 }

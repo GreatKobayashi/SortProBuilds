@@ -1,0 +1,148 @@
+﻿@page "/"
+@using DefeatYourOpponent.Domain.Entities
+@using DefeatYourOpponent.Domain.Entities.Commons
+@using DefeatYourOpponent.Domain.Exceptions
+@using DefeatYourOpponent.Domain.Logics
+@using DefeatYourOpponent.Domain.Repositories
+@using DefeatYourOpponent.UI.ViewModel
+@using RiotApiController.Domain.Misc
+@using RiotSharp
+@using RiotSharp.Misc
+@rendermode InteractiveServer
+@inject IGameResultRepository GameResultRepository
+@inject IErrorMessageConverterRepository ErrorMessageConverterRepository
+@inject IRiotDataConverterRepository RiotDataConverterRepository
+@inject ChampionsDataEntity ChampionsDataEntity
+@inject GameResultIndexViewModel GameResultIndexViewModel
+
+<PageTitle>GameResultIndex</PageTitle>
+
+<form @onsubmit=EnterSummonerName class="input-group mb-3">
+    <input class="form-control" @bind="_enteredSummonerName" placeholder="Type Summoner Name!" />
+    <div class="input-group-append">
+        <button class="btn btn-primary" type="button" @onclick="EnterSummonerName">GO</button>
+    </div>
+</form>
+<h5 class="ms-2" style="color:red;">
+    @_serchErrorMessage
+</h5>
+
+<div class="row ms-2">
+    <div class="col-auto">
+        <select class="form-select form-select-sm mx-2" @bind="_selectedQueueType">
+            <option selected value="0">Select Queue Type</option>
+            @foreach (var queueType in RiotDataConverterRepository.GetSelectableQueueType(_includeSpecialGame))
+            {
+                <option value=@queueType.QueueId>@queueType.Description</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <select class="form-select form-select-sm mx-2" @bind="_selectedPosition">
+            <option selected value="0">Select Position</option>
+            <option value=@((int)Position.TOP)>TOP</option>
+            <option value=@((int)Position.JUNGLE)>JUNGLE</option>
+            <option value=@((int)Position.MIDDLE)>MID</option>
+            <option value=@((int)Position.BOTTOM)>BOT</option>
+            <option value=@((int)Position.UTILITY)>SUP</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <div class="input-group">
+            <input type="text" class="form-control form-control-sm" placeholder="Chmpion name" @onfocus="ActivateSearchForm" @onfocusout="DeactivateSearchForm">
+            <button class="btn btn-primary btn-sm rounded-end" type="button"></button>
+            <ul class="dropdown-menu me-1 w-100 @_championSearchFormClassString" style="margin-top:30px; overflow-y: scroll; height:300px;">
+                @foreach (var champion in ChampionsDataEntity.Data.Values)
+                {
+                    <li class="ms-2" value=@champion.Key>@champion.Id</li>
+                }
+            </ul>
+        </div>
+    </div>
+    <div class="col-auto">
+        <select class="form-select form-select-sm mx-2" @bind="_selectedChampion">
+        <option selected value="0">Select Champion</option>
+        @foreach (var champion in ChampionsDataEntity.Data.Values)
+        {
+            <option value=@champion.Key>@champion.Id</option>
+        }
+        </select>
+    </div>
+</div>
+
+<table class="mt-2">
+    <tr>
+        <th width="200px">Queue</th>
+        <th width="100px">Champion</th>
+        <th width="100px">Result</th>
+        <th width="300px" colspan="6" style="text-align:center;">Item</th>
+    </tr>
+    @foreach (var game in GameResultIndexViewModel.GameResultList)
+    {
+        <tr>
+            <td>@RiotDataConverterRepository.QueueIdToString(game.QueueId)</td>
+            <td><img src=@GetChampionImagePath(game.Champion) class="rounded-circle ms-3" width="50"></td>
+            <td>@RiotDataConverterRepository.WinToString(game.Win)</td>
+            <td colspan="6">
+                @foreach (var itemId in game.Items)
+                {
+                    <img src=@GetItemImagePath(itemId) width="50">
+                }
+            </td>
+            <td><img src=@GetItemImagePath(game.Ward) width="50"></td>
+        </tr>
+    }
+</table>
+
+@code{
+    private string? _enteredSummonerName;
+    private string _serchErrorMessage = string.Empty;
+    private int _selectedQueueType;
+    private int _selectedPosition;
+    private int _selectedChampion;
+    private bool _includeSpecialGame = false;
+    private string _championSearchFormClassString = string.Empty;
+
+    private async void EnterSummonerName()
+    {
+        var tags = GameResultIndexViewModel.GetTags(_selectedQueueType, _selectedPosition, _selectedChampion);
+        var count = 10;
+        _serchErrorMessage = string.Empty;
+        try
+        {
+            await GameResultIndexViewModel.GetGameResultEntitiesBySummonerName(_enteredSummonerName, tags, count);
+        }
+        catch (RiotSharpException riotSharpException)
+        {
+            _serchErrorMessage = ErrorMessageConverterRepository.GetMessage(Language.ja_JP, riotSharpException);
+        }
+        catch (InternalException exception)
+        {
+            _serchErrorMessage = ErrorMessageConverterRepository.GetMessage(Language.ja_JP, exception);
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+
+    private string GetChampionImagePath(string championName)
+    {
+        return GameResultIndexViewModel.GetChampionImagePath(championName);
+    }
+
+    private string GetItemImagePath(long itemId)
+    {
+        return GameResultIndexViewModel.GetItemImagePath(itemId);
+    }
+
+    private void ActivateSearchForm()
+    {
+        _championSearchFormClassString = "show";
+    }
+
+    private void DeactivateSearchForm()
+    {
+        _championSearchFormClassString = string.Empty;
+    }
+}

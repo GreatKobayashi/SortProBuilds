@@ -1,3 +1,4 @@
 {
-  "ConnectionString": "Data Source=RiotApiController.db"
+  "ConnectionString": "Data Source=RiotApiController.db",
+  "MaxTryCount": 5
 }

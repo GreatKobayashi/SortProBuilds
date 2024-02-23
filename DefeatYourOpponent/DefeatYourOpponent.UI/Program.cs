@@ -1,7 +1,7 @@
-using DefeatYourOpponent.Domain.Repositories;
+using DefeatYourOpponent.Domain;
+using DefeatYourOpponent.Infrastructure;
 using DefeatYourOpponent.UI.Components;
-using RiotApiController.Domain;
-using RiotApiController.Infrastructure;
+using DefeatYourOpponent.UI.ViewModel;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,19 +9,23 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-var settingFileRepository = Factories.CreateSettingFileRepository();
-Shared.SettingEntity = settingFileRepository.GetEntity();
+Shared.SettingEntity = Factories.CreateSettingFileRepository().GetEntity();
 
 builder.Services.AddSingleton(Factories.CreateGameResultRepository());
+builder.Services.AddSingleton(
+    Factories.CreateErrorMessageConverterRespository(
+        Shared.SettingEntity.RiotApiErrorMessageListFilePath, Shared.SettingEntity.InternalErrorMessageListFilePath));
+builder.Services.AddSingleton(Factories.CreateChampionsDataRepository(Shared.SettingEntity.ChampionsDataFilePath).GetEntity());
+builder.Services.AddSingleton(Factories.CreateRiotDataConverterRepository(Shared.SettingEntity.QueueTypeListFilePath));
+
+builder.Services.AddScoped<GameResultIndexViewModel>();
 
 var app = builder.Build();
 
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 

@@ -1,0 +1,11 @@
+{
+  "予期せぬエラー": {
+    "UnknownRegion": "An Unknown error has occuered. Please inform to administrator.",
+    "en_US": "An Unknown error has occuered.",
+    "ja_JP": "予期せぬエラーが発生しました。"
+  },
+  "サーバー接続失敗": {
+    "en_US": "Connection to the internal server failed. If the problem does not improve after a few minutes, please contact the administrator.",
+    "ja_JP": "内部サーバーとの接続に失敗しました。数分経っても改善しない場合、管理者に連絡してください。"
+  }
+}
