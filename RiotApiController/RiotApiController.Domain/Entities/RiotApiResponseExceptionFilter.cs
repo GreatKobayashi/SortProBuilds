@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using RiotApiController.Domain.Entities.Commons;
 using RiotSharp;
+using System.Net;
 using System.Text.Json;
 
 namespace RiotApiController.Domain.Entities
@@ -18,6 +19,18 @@ namespace RiotApiController.Domain.Entities
                 context.Result = new ObjectResult(JsonSerializer.Serialize(riotApiErrorResponseBody))
                 {
                     StatusCode = (int)riotSharpException.HttpStatusCode
+                };
+
+                context.ExceptionHandled = true;
+            }
+            else if (context.Exception != null)
+            {
+                var elseException = new RiotSharpException(context.Exception.Message, HttpStatusCode.InternalServerError);
+
+                var riotApiErrorResponseBody = new RiotApiErrorResponseBody(elseException);
+                context.Result = new ObjectResult(JsonSerializer.Serialize(riotApiErrorResponseBody))
+                {
+                    StatusCode = (int)elseException.HttpStatusCode
                 };
 
                 context.ExceptionHandled = true;

@@ -30,7 +30,7 @@
 <div class="row ms-2">
     <div class="col-auto">
         <select class="form-select form-select-sm mx-2" @bind="_selectedQueueType">
-            <option selected value="0">Select Queue Type</option>
+            <option selected value="0">All Queue Type</option>
             @foreach (var queueType in RiotDataConverterRepository.GetSelectableQueueType(_includeSpecialGame))
             {
                 <option value=@queueType.QueueId>@queueType.Description</option>
@@ -39,7 +39,7 @@
     </div>
     <div class="col-auto">
         <select class="form-select form-select-sm mx-2" @bind="_selectedPosition">
-            <option selected value="0">Select Position</option>
+            <option selected value="0">All Position</option>
             <option value=@((int)Position.TOP)>TOP</option>
             <option value=@((int)Position.JUNGLE)>JUNGLE</option>
             <option value=@((int)Position.MIDDLE)>MID</option>
@@ -49,8 +49,12 @@
     </div>
     <div class="col-auto">
         <div class="input-group">
-            <input type="text" class="form-control form-control-sm rounded" placeholder="Champion name" @onfocus="ActivateSearchForm" @onfocusout="DeactivateSearchForm" @oninput="x => UpdataChampionList(x.Value?.ToString())" @bind-value="_inputedChampionName">
-            <ul class="dropdown-menu me-1 w-100 @_championSearchFormClassString" style="margin-top:30px; overflow-y: scroll; max-height:300px;">
+            <button class="btn p-0 rounded" type="button" data-bs-toggle="dropdown" aria-expanded="false" @onclick="FocusInputForm">
+                <input type="text" class="form-control form-control-sm rounded" placeholder="Champion name" @oninput="x => UpdataChampionList(x.Value?.ToString())" @bind-value="_inputedChampionName" @ref="_inputFormReference">
+            </button>
+            
+            <ul class="dropdown-menu w-100" style="overflow-y: scroll; max-height:300px;">
+                <li><button class="dropdown-item" type="button" @onclick="() => ClickChampionListRow()">@GameResultIndexViewModel.DefaultInputedChampionName</button></li>
                 @foreach (var champion in _championList)
                 {
                     <li><button class="dropdown-item" type="button" @onclick="() => ClickChampionListRow(champion.Id)">@champion.Id</button></li>
@@ -94,6 +98,7 @@
     private string _championSearchFormClassString = string.Empty;
     private string _inputedChampionName = string.Empty;
     private List<ChampionDataEntity> _championList = new List<ChampionDataEntity>();
+    private ElementReference _inputFormReference;
 
     protected override void OnInitialized()
     {
@@ -103,11 +108,11 @@
 
     private async void EnterSummonerName()
     {
-        var tags = GameResultIndexViewModel.GetTags(_selectedQueueType, _selectedPosition, _selectedChampion);
         var count = 10;
         _serchErrorMessage = string.Empty;
         try
         {
+            var tags = GameResultIndexViewModel.GetTags(_selectedQueueType, _selectedPosition, _inputedChampionName);
             await GameResultIndexViewModel.GetGameResultEntitiesBySummonerName(_enteredSummonerName, tags, count);
         }
         catch (RiotSharpException riotSharpException)
@@ -157,5 +162,24 @@
     {
         _inputedChampionName = championId;
         DeactivateSearchForm();
+    }
+
+    private void ClickChampionListRow()
+    {
+        _inputedChampionName = GameResultIndexViewModel.DefaultInputedChampionName;
+        DeactivateSearchForm();
+    }
+
+    private async void FocusInputForm()
+    {
+        if (_inputedChampionName == GameResultIndexViewModel.DefaultInputedChampionName)
+        {
+            UpdataChampionList(string.Empty);
+        }
+        else
+        {
+            UpdataChampionList(_inputedChampionName);
+        }
+        await _inputFormReference.FocusAsync();
     }
 }

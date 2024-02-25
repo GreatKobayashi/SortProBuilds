@@ -7,5 +7,9 @@
   "サーバー接続失敗": {
     "en_US": "Connection to the internal server failed. If the problem does not improve after a few minutes, please contact the administrator.",
     "ja_JP": "内部サーバーとの接続に失敗しました。数分経っても改善しない場合、管理者に連絡してください。"
+  },
+  "一致するチャンピオン名なし": {
+    "en_US": "No champions matching the input name. Please check your input.",
+    "ja_JP": "入力名に一致するチャンピオンがいません。入力内容を確認してください。"
   }
 }

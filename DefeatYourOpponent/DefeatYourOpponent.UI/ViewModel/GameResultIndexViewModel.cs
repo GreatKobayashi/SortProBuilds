@@ -1,5 +1,6 @@
 ﻿using DefeatYourOpponent.Domain.Entities;
 using DefeatYourOpponent.Domain.Entities.Commons;
+using DefeatYourOpponent.Domain.Exceptions;
 using DefeatYourOpponent.Domain.Repositories;
 using RiotApiController.Domain.Misc;
 using RiotSharp;
@@ -13,6 +14,8 @@ namespace DefeatYourOpponent.UI.ViewModel
         private readonly ChampionsDataEntity _championsDataEntity;
         private static readonly string _championImagesDirectoryPath = "images/champion/tiles/";
         private static readonly string _itemImagesDirectoryPath = "images/item/";
+
+        public string DefaultInputedChampionName { get; } = "All Champion";
 
         public List<GameResultEntity> GameResultList { get; private set; } = new List<GameResultEntity>();
 
@@ -54,7 +57,7 @@ namespace DefeatYourOpponent.UI.ViewModel
             return $"{_itemImagesDirectoryPath}{id}.png";
         }
 
-        public TagEntity GetTags(int queueType, int position, int champion)
+        public TagEntity GetTags(int queueType, int position, string championName)
         {
             var tags = new TagEntity();
 
@@ -66,9 +69,16 @@ namespace DefeatYourOpponent.UI.ViewModel
             {
                 tags.Position = (Position)position;
             }
-            if (champion != 0)
+            if (!string.IsNullOrEmpty(championName) && championName != DefaultInputedChampionName)
             {
-                tags.Champion = _championsDataEntity.Data.First(x => x.Value.Key == champion.ToString()).Value.Id;
+                if (_championsDataEntity.Data.ContainsKey(championName))
+                {
+                    tags.Champion = championName;
+                }
+                else
+                {
+                    throw new InternalException("一致するチャンピオン名なし");
+                }
             }
 
             return tags;
