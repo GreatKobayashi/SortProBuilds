@@ -14,13 +14,21 @@
 @inject IRiotDataConverterRepository RiotDataConverterRepository
 @inject ChampionsDataEntity ChampionsDataEntity
 @inject GameResultIndexViewModel GameResultIndexViewModel
+@inject NavigationManager NavigationManager
 
 <PageTitle>GameResultIndex</PageTitle>
 
 <form @onsubmit=EnterSummonerName class="input-group mb-3">
+    <span class="input-group-text rounded-end rounded-pill pe-1"> Region</span>
+    <select class="form-select" style="max-width:150px;" @bind="_selectedRegion">
+        <option value="-1" selected>Select region</option>
+        <option class="ms-2" value="@((int)Region.Jp)">@Region.Jp</option>
+        <option class="ms-2" value="@((int)Region.Na)">@Region.Na</option>
+        <option class="ms-2" value="@((int)Region.Kr)">@Region.Kr</option>
+    </select>
     <input class="form-control" @bind="_enteredSummonerName" placeholder="Type Summoner Name!" />
     <div class="input-group-append">
-        <button class="btn btn-primary" type="button" @onclick="EnterSummonerName">GO</button>
+        <button class="btn btn-primary rounded-start rounded-pill ps-1" type="button" @onclick="EnterSummonerName">GO </button>
     </div>
 </form>
 <h5 class="ms-2" style="color:red;">
@@ -71,19 +79,20 @@
         <th width="100px">Result</th>
         <th width="300px" colspan="6" style="text-align:center;">Item</th>
     </tr>
-    @foreach (var game in GameResultIndexViewModel.GameResultList)
+    @foreach (var gameResult in GameResultIndexViewModel.GameResultList)
     {
         <tr>
-            <td>@RiotDataConverterRepository.QueueIdToString(game.QueueId)</td>
-            <td><img src=@GetChampionImagePath(game.Champion) class="rounded-circle ms-3" width="50"></td>
-            <td>@RiotDataConverterRepository.WinToString(game.Win)</td>
+            <td>@RiotDataConverterRepository.QueueIdToString(gameResult.QueueId)</td>
+            <td><img src=@GetChampionImagePath(gameResult.Champion) class="rounded-circle ms-3" width="50"></td>
+            <td>@RiotDataConverterRepository.WinToString(gameResult.Win)</td>
             <td colspan="6">
-                @foreach (var itemId in game.Items)
+                @foreach (var itemId in gameResult.Items)
                 {
                     <img src=@GetItemImagePath(itemId) width="50">
                 }
             </td>
-            <td><img src=@GetItemImagePath(game.Ward) width="50"></td>
+            <td><img src=@GetItemImagePath(gameResult.Ward) width="50"></td>
+            <td><button class="btn btn-primary" @onclick="x => NavigateToGameDetail(_selectedRegion, gameResult.GameId, gameResult.TargetId, gameResult.OpponentId)">See Detail</button></td>
         </tr>
     }
 </table>
@@ -91,6 +100,7 @@
 @code{
     private string? _enteredSummonerName;
     private string _serchErrorMessage = string.Empty;
+    private int _selectedRegion = -1;
     private int _selectedQueueType;
     private int _selectedPosition;
     private int _selectedChampion;
@@ -113,7 +123,7 @@
         try
         {
             var tags = GameResultIndexViewModel.GetTags(_selectedQueueType, _selectedPosition, _inputedChampionName);
-            await GameResultIndexViewModel.GetGameResultEntitiesBySummonerName(_enteredSummonerName, tags, count);
+            await GameResultIndexViewModel.GetGameResultEntitiesBySummonerName(_selectedRegion, _enteredSummonerName, tags, count);
         }
         catch (RiotSharpException riotSharpException)
         {
@@ -181,5 +191,11 @@
             UpdataChampionList(_inputedChampionName);
         }
         await _inputFormReference.FocusAsync();
+    }
+
+    private void NavigateToGameDetail(int regionNum, string gameId, int targetId, int opponentId)
+    {
+        var region = (Region)regionNum;
+        NavigationManager.NavigateTo($"/{region}/game={gameId}_target={targetId}_opponent={opponentId}");
     }
 }

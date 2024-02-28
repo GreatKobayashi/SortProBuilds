@@ -2,7 +2,8 @@
   "RiotControllerSetting": {
     "BaseUrl": "https://localhost:7058",
     "ApiUrls": {
-      "GetGameResult": "api/PostTakeGameResult"
+      "GetGameResults": "api/PostTagsTakeGameResults",
+      "GetGameTimeLine": "api/GetTimeLine/{0}"
     }
   },
   "RiotApiErrorMessageListFilePath": "RiotApiErrorMessageList.json",

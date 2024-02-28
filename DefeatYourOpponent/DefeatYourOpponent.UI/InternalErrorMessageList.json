@@ -11,5 +11,13 @@
   "一致するチャンピオン名なし": {
     "en_US": "No champions matching the input name. Please check your input.",
     "ja_JP": "入力名に一致するチャンピオンがいません。入力内容を確認してください。"
+  },
+  "サモナー名未入力": {
+    "en_US": "Enter a summoner name.",
+    "ja_JP": "サモナー名を入力してください。"
+  },
+  "地域未選択": {
+    "en_US": "Select region.",
+    "ja_JP": "地域を選択してください。"
   }
 }

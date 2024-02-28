@@ -12,6 +12,7 @@ builder.Services.AddRazorComponents()
 Shared.SettingEntity = Factories.CreateSettingFileRepository().GetEntity();
 
 builder.Services.AddSingleton(Factories.CreateGameResultRepository());
+builder.Services.AddSingleton(Factories.CreateTimeTineRepository());
 builder.Services.AddSingleton(
     Factories.CreateErrorMessageConverterRespository(
         Shared.SettingEntity.RiotApiErrorMessageListFilePath, Shared.SettingEntity.InternalErrorMessageListFilePath));
@@ -19,6 +20,7 @@ builder.Services.AddSingleton(Factories.CreateChampionsDataRepository(Shared.Set
 builder.Services.AddSingleton(Factories.CreateRiotDataConverterRepository(Shared.SettingEntity.QueueTypeListFilePath));
 
 builder.Services.AddScoped<GameResultIndexViewModel>();
+builder.Services.AddScoped<GameDetailViewModel>();
 
 var app = builder.Build();
 

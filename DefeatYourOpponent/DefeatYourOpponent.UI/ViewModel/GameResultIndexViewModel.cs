@@ -4,6 +4,7 @@ using DefeatYourOpponent.Domain.Exceptions;
 using DefeatYourOpponent.Domain.Repositories;
 using RiotApiController.Domain.Misc;
 using RiotSharp;
+using RiotSharp.Misc;
 using System.Net;
 
 namespace DefeatYourOpponent.UI.ViewModel
@@ -27,13 +28,18 @@ namespace DefeatYourOpponent.UI.ViewModel
         }
 
         public async Task GetGameResultEntitiesBySummonerName(
-            string? enteredSummonerName, TagEntity tags, int count)
+            int regionNum, string? enteredSummonerName, TagEntity tags, int count)
         {
             GameResultList.Clear();
 
+            if (regionNum < 0)
+            {
+                throw new InternalException("地域未選択");
+            }
+            var region = (Region)regionNum;
             if (!string.IsNullOrEmpty(enteredSummonerName))
             {
-                GameResultList = await _gameResultRepository.GetGameResultEntitiesAsync(enteredSummonerName, tags, count);
+                GameResultList = await _gameResultRepository.GetGameResultEntitiesAsync(region, enteredSummonerName, tags, count);
                 GameResultList.ForEach(result => result.Items.RemoveAll(id => id == 0));
 
                 if (GameResultList.Count < count)
@@ -43,7 +49,7 @@ namespace DefeatYourOpponent.UI.ViewModel
             }
             else
             {
-                throw new RiotSharpException("Null Summoner name", new HttpStatusCode());
+                throw new InternalException("サモナー名未入力");
             }
         }
 

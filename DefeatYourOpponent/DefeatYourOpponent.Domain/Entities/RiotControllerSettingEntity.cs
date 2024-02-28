@@ -4,6 +4,8 @@ namespace DefeatYourOpponent.Domain.Entities
 {
     public class RiotControllerSettingEntity
     {
+        private string _getGameResultsApiUrlKey = "GetGameResults";
+
         [JsonInclude]
         public string BaseUrl { get; private set; }
 
@@ -16,11 +18,11 @@ namespace DefeatYourOpponent.Domain.Entities
             ApiUrls = apiUrls;
         }
 
-        public string GetGameResultUrl
+        public string GetGameResultsUrl
         {
             get
             {
-                ApiUrls.TryGetValue("GetGameResult", out string? url);
+                ApiUrls.TryGetValue(_getGameResultsApiUrlKey, out string? url);
                 return url != null ? url : throw new Exception("URL設定なし");
             }
         }

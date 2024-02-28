@@ -13,7 +13,7 @@ namespace DefeatYourOpponent.Domain.Entities
         [JsonInclude]
         public string ChampionsDataFilePath { get; private set; }
         [JsonInclude]
-        public string QueueTypeListFilePath {  get; private set; }
+        public string QueueTypeListFilePath { get; private set; }
 
         public SettingEntity(RiotControllerSettingEntity riotControllerSetting,
             string riotApiErrorMessageListFilePath,

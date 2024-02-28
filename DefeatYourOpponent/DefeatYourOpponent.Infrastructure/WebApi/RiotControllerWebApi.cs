@@ -9,7 +9,7 @@ using System.Net.Http.Json;
 
 namespace DefeatYourOpponent.Infrastructure.WebApi
 {
-    public class RiotControllerWebApi : IGameResultRepository
+    public class RiotControllerWebApi : IGameResultRepository, ITimeLineRepository
     {
         private HttpClient _httpClient;
 
@@ -22,16 +22,15 @@ namespace DefeatYourOpponent.Infrastructure.WebApi
         }
 
         public async Task<List<GameResultEntity>> GetGameResultEntitiesAsync(
-            string summonerName, TagEntity tags, int count)
+            Region region, string summonerName, TagEntity tags, int count)
         {
-            // ★TODO: tag, Region選択の実装後反映
-            var testRequest = new RiotApiGetGameResultRequestBody(Region.Jp, summonerName, tags, count);
+            var requestBody = new RiotApiGetGameResultRequestBody(region, summonerName, tags, count);
 
             HttpResponseMessage response;
             try
             {
                 response = await _httpClient.PostAsJsonAsync(
-                    Shared.SettingEntity.RiotControllerSetting.GetGameResultUrl, testRequest);
+                    Shared.SettingEntity.RiotControllerSetting.GetGameResultsUrl, requestBody);
             }
             catch (Exception ex)
             {
@@ -39,6 +38,11 @@ namespace DefeatYourOpponent.Infrastructure.WebApi
             }
 
             return ResponseConverter.Convert<List<GameResultEntity>>(response);
+        }
+
+        public TimeLineEntity GetTimeLineAsync(Region region, string gameId, int targetId, int opponentId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

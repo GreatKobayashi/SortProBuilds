@@ -34,5 +34,10 @@ namespace DefeatYourOpponent.Infrastructure
         {
             return new RiotDataConverterJson(queueIdListFilePath);
         }
+
+        public static ITimeLineRepository CreateTimeTineRepository()
+        {
+            return new RiotControllerWebApi();
+        }
     }
 }

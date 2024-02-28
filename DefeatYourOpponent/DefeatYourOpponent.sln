@@ -5,9 +5,9 @@ VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DefeatYourOpponent.UI", "DefeatYourOpponent.UI\DefeatYourOpponent.UI.csproj", "{226E8199-E89C-41BF-B893-F7271657EA6F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DefeatYourOpponent.Domain", "DefeatYourOpponent.Domain\DefeatYourOpponent.Domain.csproj", "{722D96D4-EF6C-4784-B1EA-C2B81D05D53F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DefeatYourOpponent.Domain", "DefeatYourOpponent.Domain\DefeatYourOpponent.Domain.csproj", "{722D96D4-EF6C-4784-B1EA-C2B81D05D53F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DefeatYourOpponent.Infrastructure", "DefeatYourOpponent.Infrastructure\DefeatYourOpponent.Infrastructure.csproj", "{B8033951-B8F5-416D-9AE2-6D1B56DFDF59}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DefeatYourOpponent.Infrastructure", "DefeatYourOpponent.Infrastructure\DefeatYourOpponent.Infrastructure.csproj", "{B8033951-B8F5-416D-9AE2-6D1B56DFDF59}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -12,10 +12,6 @@
     "en_US": "No player with the entered sumoner name.",
     "ja_JP": "入力したサモナー名のプレイヤーは存在しません。"
   },
-  "Null Summoner name": {
-    "en_US": "Enter a summoner name.",
-    "ja_JP": "サモナー名を入力してください。"
-  },
   "Few data": {
     "en_US": "Few games that meet the specified criteria. Please search with different criteria.",
     "ja_JP": "指定の条件を満たすゲームが少ないです。条件を変えて検索してください。"

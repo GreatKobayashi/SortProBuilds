@@ -1,0 +1,26 @@
+﻿@page "/{RegionStr}/game={GameId}_target={TargetId}_opponent={OpponentId}"
+@using DefeatYourOpponent.UI.ViewModel
+@using RiotSharp.Misc
+@inject GameDetailViewModel GameDetailViewModel
+
+<h3>GameDetail</h3>
+id = @GameId 
+
+@code {
+#pragma warning disable CS8618
+    [Parameter]
+    public string GameId { get; set; }
+    [Parameter]
+    public string RegionStr { get; set; }
+    [Parameter]
+    public string TargetId { get; set; }
+    [Parameter]
+    public string OpponentId { get; set; }
+#pragma warning restore CS8618
+
+    protected override void OnInitialized()
+    {
+        var region = (Region)Enum.Parse(typeof(Region), RegionStr);
+        GameDetailViewModel.GetGameTimeLine(region, GameId, int.Parse(TargetId), int.Parse(OpponentId));
+    }
+}

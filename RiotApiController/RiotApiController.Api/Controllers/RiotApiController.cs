@@ -3,6 +3,7 @@ using RiotApiController.Domain.Entities.Commons;
 using RiotApiController.Domain.Repositories;
 using RiotApiController.Infrastructure;
 using RiotSharp;
+using RiotSharp.Misc;
 using System.Net;
 using System.Text.Json;
 
@@ -12,7 +13,7 @@ namespace RiotApiController.Api.Controllers
     [ApiController]
     public class RiotApiController : ControllerBase
     {
-        private string _apiKey = "RGAPI-c79e22ec-3cd0-4ffa-8b7a-8ae5a60d9ffd";
+        private string _apiKey = "RGAPI-24b3a057-7a51-468a-8bfe-5caf936e655f";
 
         private GameResultRepository _gameResultRepository;
 
@@ -22,7 +23,7 @@ namespace RiotApiController.Api.Controllers
             _gameResultRepository = new GameResultRepository(Factories.CreateGameResultRepository(api));
         }
 
-        [Route("PostTakeGameResult")]
+        [Route("PostTagsTakeGameResults")]
         [HttpPost]
         public async Task<string> PostTakeGameResultAsync(RiotApiGetGameResultRequestBody requestBody)
         {
@@ -32,13 +33,24 @@ namespace RiotApiController.Api.Controllers
                 var gameList = await _gameResultRepository.GetGameResultAsync(10, requestBody.Region, puuid, requestBody.Tags);
                 return JsonSerializer.Serialize(gameList);
             }
-            catch (RiotSharpException)
+            catch (Exception)
             {
                 throw;
             }
-            catch (Exception ex)
+        }
+
+        [Route("GetTimeLine/{gameId}")]
+        [HttpGet]
+        public async Task<string> GetTimeLineAsync([FromQuery] Region region, string gameId, [FromQuery] int targetId, [FromQuery] int opponentId)
+        {
+            try
             {
-                throw new RiotSharpException(ex.Message, HttpStatusCode.InternalServerError);
+                var timeLine = await _gameResultRepository.GetTimeLine(region, gameId, targetId, opponentId);
+                return JsonSerializer.Serialize(timeLine);
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
     }

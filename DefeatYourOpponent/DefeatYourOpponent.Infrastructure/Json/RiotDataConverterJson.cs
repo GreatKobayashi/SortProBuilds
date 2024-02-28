@@ -1,7 +1,6 @@
 ﻿using DefeatYourOpponent.Domain.Entities;
 using DefeatYourOpponent.Domain.Repositories;
 using RiotApiController.Domain.Helper;
-using RiotApiController.Domain.Misc;
 
 namespace DefeatYourOpponent.Domain.Logics
 {
@@ -37,7 +36,7 @@ namespace DefeatYourOpponent.Domain.Logics
             {
                 return _queueTypeList.FindAll(x => x.Notes == null && x.Description != null);
             }
-            return _queueTypeList.FindAll(x => x.QueueId == 420 || x.QueueId == 440 || x.QueueId == 450 || x.QueueId == 490 );
+            return _queueTypeList.FindAll(x => x.QueueId == 420 || x.QueueId == 440 || x.QueueId == 450 || x.QueueId == 490);
         }
     }
 }

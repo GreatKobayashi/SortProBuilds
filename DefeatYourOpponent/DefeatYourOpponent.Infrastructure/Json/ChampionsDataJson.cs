@@ -1,11 +1,7 @@
 ﻿using DefeatYourOpponent.Domain.Entities;
 using DefeatYourOpponent.Domain.Repositories;
 using RiotApiController.Domain.Helper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DefeatYourOpponent.Infrastructure.Json
 {
