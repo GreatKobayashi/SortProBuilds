@@ -7,16 +7,15 @@ namespace DefeatYourOpponent.UI.ViewModel
     public class GameDetailViewModel
     {
         private ITimeLineRepository _timeLineRepository;
-        public TimeLineEntity? TimeLine { get; set; }
 
         public GameDetailViewModel(ITimeLineRepository timeLineRepository)
         {
             _timeLineRepository = timeLineRepository;
         }
 
-        public void GetGameTimeLine(Region region, string gameId, int targetId, int opponentId)
+        public async Task<GameDetailEntity> GetGameDetailAsync(Region region, string matchId, int targetId, int opponentId)
         {
-            //_timeLineRepository.GetTimeLineAsync(region, gameId, targetId, opponentId);
+            return await _timeLineRepository.GetGameDetailAsync(region, matchId, targetId, opponentId);
         }
     }
 }

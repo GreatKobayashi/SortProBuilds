@@ -17,6 +17,26 @@
 <body>
     <Routes />
     <script src="_framework/blazor.web.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
+    <!-- This is the glue between Blazor and Chart.js -->
+    <script src="_content/ChartJs.Blazor.Fork/ChartJsBlazorInterop.js"></script>
+    <script>
+        window.workaroundGradient = function (canvasId) {
+            let canvas = document.getElementById(canvasId);
+            let ctx = canvas.getContext("2d");
+            let gradient = ctx.createLinearGradient(0, 0, 0, canvas.clientHeight);
+            gradient.addColorStop(0, 'rgba(54, 162, 235, 1)');
+            gradient.addColorStop(1, 'rgba(54, 162, 235, 0)');
+
+            let chart = window.ChartJsInterop.BlazorCharts.get(canvasId);
+            let datasets = chart.config.data.datasets;
+            for (let dataset of datasets) {
+                dataset.backgroundColor = gradient;
+            }
+        }
+    </script>
 </body>
 
 </html>

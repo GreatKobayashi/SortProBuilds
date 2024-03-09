@@ -13,8 +13,6 @@ namespace DefeatYourOpponent.UI.ViewModel
     {
         private readonly IGameResultRepository _gameResultRepository;
         private readonly ChampionsDataEntity _championsDataEntity;
-        private static readonly string _championImagesDirectoryPath = "images/champion/tiles/";
-        private static readonly string _itemImagesDirectoryPath = "images/item/";
 
         public string DefaultInputedChampionName { get; } = "All Champion";
 
@@ -27,7 +25,7 @@ namespace DefeatYourOpponent.UI.ViewModel
             _championsDataEntity = championsDataEntity;
         }
 
-        public async Task GetGameResultEntitiesBySummonerName(
+        public async Task GetGameResultEntitiesBySummonerNameAsync(
             int regionNum, string? enteredSummonerName, TagEntity tags, int count)
         {
             GameResultList.Clear();
@@ -40,7 +38,7 @@ namespace DefeatYourOpponent.UI.ViewModel
             if (!string.IsNullOrEmpty(enteredSummonerName))
             {
                 GameResultList = await _gameResultRepository.GetGameResultEntitiesAsync(region, enteredSummonerName, tags, count);
-                GameResultList.ForEach(result => result.Items.RemoveAll(id => id == 0));
+                GameResultList.ForEach(result => result.TargetPlayerData.Items.RemoveAll(id => id == 0));
 
                 if (GameResultList.Count < count)
                 {
@@ -53,27 +51,17 @@ namespace DefeatYourOpponent.UI.ViewModel
             }
         }
 
-        public string GetChampionImagePath(string championName)
-        {
-            return $"{_championImagesDirectoryPath}{championName}_0.jpg";
-        }
-
-        public string GetItemImagePath(long id)
-        {
-            return $"{_itemImagesDirectoryPath}{id}.png";
-        }
-
         public TagEntity GetTags(int queueType, int position, string championName)
         {
             var tags = new TagEntity();
 
             if (queueType != 0)
             {
-                tags.QueType = queueType;
+                tags.QueueType = queueType;
             }
             if (position != 0)
             {
-                tags.Position = (Position)position;
+                tags.Position = (TeamPosition)position;
             }
             if (!string.IsNullOrEmpty(championName) && championName != DefaultInputedChampionName)
             {

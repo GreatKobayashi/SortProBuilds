@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RiotApiController.Domain\RiotApiController.Domain.csproj" />
-    <ProjectReference Include="..\RiotApiController.Infrastrycture\RiotApiController.Infrastructure.csproj" />
+    <ProjectReference Include="..\RiotApiController.Infrastructure\RiotApiController.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

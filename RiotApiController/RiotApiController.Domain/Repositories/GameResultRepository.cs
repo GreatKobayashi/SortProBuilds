@@ -1,8 +1,5 @@
 ﻿using RiotApiController.Domain.Entities.Commons;
-using RiotSharp.Endpoints.AccountEndpoint.Enums;
-using RiotSharp.Endpoints.MatchEndpoint.Enums;
 using RiotSharp.Misc;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace RiotApiController.Domain.Repositories
 {
@@ -41,9 +38,9 @@ namespace RiotApiController.Domain.Repositories
             return await _gameResultRepository.GetPuuidAsync(region, summonerName);
         }
 
-        public async Task<TimeLineEntity> GetTimeLine(Region region, string gameId, int targetId, int opponentId)
+        public async Task<GameDetailEntity> GetGetGameDetailAsync(Region region, string matchId, int targetId, int opponentId)
         {
-            return await _gameResultRepository.GetTimeLine(region, gameId, targetId, opponentId);
+            return await _gameResultRepository.GetGetGameDetailAsync(region, matchId, targetId, opponentId);
         }
     }
 }

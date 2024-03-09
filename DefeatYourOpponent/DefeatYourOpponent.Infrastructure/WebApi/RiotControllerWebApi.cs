@@ -40,9 +40,20 @@ namespace DefeatYourOpponent.Infrastructure.WebApi
             return ResponseConverter.Convert<List<GameResultEntity>>(response);
         }
 
-        public TimeLineEntity GetTimeLineAsync(Region region, string gameId, int targetId, int opponentId)
+        public async Task<GameDetailEntity> GetGameDetailAsync(Region region, string matchId, int targetId, int opponentId)
         {
-            throw new NotImplementedException();
+            HttpResponseMessage response;
+            try
+            {
+                response = await _httpClient.GetAsync(
+                    Shared.SettingEntity.RiotControllerSetting.CreateGameDetailUrlQuery(region, matchId, targetId, opponentId));
+            }
+            catch (Exception ex)
+            {
+                throw new InternalException("サーバー接続失敗", ex);
+            }
+
+            return ResponseConverter.Convert<GameDetailEntity>(response);
         }
     }
 }

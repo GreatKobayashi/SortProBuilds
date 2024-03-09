@@ -1,26 +1,153 @@
-﻿@page "/{RegionStr}/game={GameId}_target={TargetId}_opponent={OpponentId}"
+﻿@page "/{RegionStr}/game={MatchId}_target={TargetId}_opponent={OpponentId}"
+@rendermode @(new InteractiveServerRenderMode(false))
+@using ChartJs.Blazor.Common.Axes.Ticks
+@using ChartJs.Blazor.LineChart
+@using DefeatYourOpponent.Domain.Entities.Commons
+@using DefeatYourOpponent.Domain.Helper
+@using DefeatYourOpponent.Domain.Misc
 @using DefeatYourOpponent.UI.ViewModel
 @using RiotSharp.Misc
 @inject GameDetailViewModel GameDetailViewModel
 
 <h3>GameDetail</h3>
-id = @GameId 
+<div class="d-flex flex-row justify-content-center">
+    @if (_targetDataEntity != null && _opponentDataEntity != null)
+    {
+        <div class="col-auto">
+            <img src=@ComponentUtility.GetChampionImagePath(_targetDataEntity.Champion) class="rounded-circle" width="200">
+        </div>
+        <div class="col-auto d-flex justify-content-center align-items-center p-3"><h2>vs.</h2></div>
+        <div class="col-auto">
+            <img src=@ComponentUtility.GetChampionImagePath(_opponentDataEntity.Champion) class="rounded-circle" width="200">
+        </div>
+    }
+    else
+    {
+        <div class="col-auto">
+        </div>
+        <div class="col-auto d-flex justify-content-center align-items-center p-3"><h2>vs.</h2></div>
+        <div class="col-auto">
+        </div>
+    }
+</div>
+
+<div class="d-flex flex-row justify-content-center">
+    <div class="col" style="max-width:1000px;">
+        <Chart Config="_config" @ref="_chart"></Chart>
+    </div>
+</div>
+
 
 @code {
-#pragma warning disable CS8618
+    #pragma warning disable CS8618
     [Parameter]
-    public string GameId { get; set; }
+    public string MatchId { get; set; }
     [Parameter]
     public string RegionStr { get; set; }
     [Parameter]
     public string TargetId { get; set; }
     [Parameter]
     public string OpponentId { get; set; }
+
+    private Chart _chart;
 #pragma warning restore CS8618
 
-    protected override void OnInitialized()
+    private LineConfig _config = new LineConfig()
     {
-        var region = (Region)Enum.Parse(typeof(Region), RegionStr);
-        GameDetailViewModel.GetGameTimeLine(region, GameId, int.Parse(TargetId), int.Parse(OpponentId));
+        Options = new LineOptions
+        {
+            Responsive = true,
+            Title = new OptionsTitle
+            {
+                Display = true,
+                Text = "Total gold changes"
+            },
+            Tooltips = new Tooltips
+            {
+                Mode = InteractionMode.Nearest,
+                Intersect = true
+            },
+            Hover = new Hover
+            {
+                Mode = InteractionMode.Nearest,
+                Intersect = true
+            },
+            Scales = new Scales
+            {
+                XAxes = new List<CartesianAxis>
+                {
+                    new CategoryAxis
+                    {
+                        ScaleLabel = new ScaleLabel
+                        {
+                            LabelString = "Minute",
+                            Display = true
+                        },
+                        Ticks = new CategoryTicks()
+                        {
+                            AutoSkip = true
+                        }
+                    }
+                },
+                YAxes = new List<CartesianAxis>
+                {
+                    new LinearCartesianAxis
+                    {
+                        ScaleLabel = new ScaleLabel
+                        {
+                            LabelString = "Total Gold",
+                            Display = true
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    private TimeLineEntity? _timeLine;
+    private GameDetailEntity? _gameDetailEntity;
+    private PlayerDataEntity? _targetDataEntity;
+    private PlayerDataEntity? _opponentDataEntity;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                var region = (Region)Enum.Parse(typeof(Region), RegionStr);
+                _gameDetailEntity = await GameDetailViewModel.GetGameDetailAsync(region, MatchId, int.Parse(TargetId), int.Parse(OpponentId)).ConfigureAwait(false);
+                _timeLine = _gameDetailEntity.TimeLine;
+                _targetDataEntity = _gameDetailEntity.PlayerDataList.First(x => x.ParticipantId == int.Parse(TargetId));
+                _opponentDataEntity = _gameDetailEntity.PlayerDataList.First(x => x.ParticipantId == int.Parse(OpponentId));
+                var targetTotalGoldChanges = _timeLine.GetTargetTotalGoldChanges(TargetId);
+                var targetTotalGoldData = new LineDataset<int>(targetTotalGoldChanges)
+                    {
+                        Label = "You",
+                        BackgroundColor = ColorUtil.FromDrawingColor(Color.FromArgb(10, 54, 162, 235)),
+                        BorderColor = ColorUtil.FromDrawingColor(Color.FromArgb(100, 54, 162, 235)),
+                        Fill = FillingMode.Origin
+                    };
+
+                var opponentTotalGoldChanges = _timeLine.GetTargetTotalGoldChanges(OpponentId);
+                var opponentTotalGoldData = new LineDataset<int>(opponentTotalGoldChanges)
+                    {
+                        Label = "Opponent",
+                        BackgroundColor = ColorUtil.FromDrawingColor(ChartColors.Red(10)),
+                        BorderColor = ColorUtil.FromDrawingColor(ChartColors.Red(100)),
+                        Fill = FillingMode.Origin
+                    };
+
+                _config.Data.Labels.AddRange(Array.ConvertAll(Enumerable.Range(0, targetTotalGoldChanges.Length).ToArray(), x => x.ToString()));
+                _config.Data.Datasets.Add(targetTotalGoldData);
+                _config.Data.Datasets.Add(opponentTotalGoldData);
+                await _chart.Update();
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Write(ex);
+        }
     }
 }

@@ -6,14 +6,14 @@ namespace DefeatYourOpponent.Domain.Entities.Commons
     {
         public string? Champion { get; set; }
         public bool? Win { get; set; }
-        public Position? Position { get; set; }
-        public int? QueType { get; set; }
+        public TeamPosition? Position { get; set; }
+        public int? QueueType { get; set; }
 
         public bool IsMatch(GameResultEntity gameResultEntity)
         {
-            if (!string.IsNullOrEmpty(Champion) && gameResultEntity.Champion != Champion ||
+            if (!string.IsNullOrEmpty(Champion) && gameResultEntity.TargetPlayerData.Champion != Champion ||
                 Win != null && gameResultEntity.Win != Win ||
-                Position != null && gameResultEntity.Position != Position)
+                Position != null && gameResultEntity.TargetPlayerData.Position != Position)
             {
                 return false;
             }

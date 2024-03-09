@@ -48,11 +48,11 @@
     <div class="col-auto">
         <select class="form-select form-select-sm mx-2" @bind="_selectedPosition">
             <option selected value="0">All Position</option>
-            <option value=@((int)Position.TOP)>TOP</option>
-            <option value=@((int)Position.JUNGLE)>JUNGLE</option>
-            <option value=@((int)Position.MIDDLE)>MID</option>
-            <option value=@((int)Position.BOTTOM)>BOT</option>
-            <option value=@((int)Position.UTILITY)>SUP</option>
+            <option value=@((int)TeamPosition.TOP)>TOP</option>
+            <option value=@((int)TeamPosition.JUNGLE)>JUNGLE</option>
+            <option value=@((int)TeamPosition.MIDDLE)>MID</option>
+            <option value=@((int)TeamPosition.BOTTOM)>BOT</option>
+            <option value=@((int)TeamPosition.UTILITY)>SUP</option>
         </select>
     </div>
     <div class="col-auto">
@@ -83,16 +83,16 @@
     {
         <tr>
             <td>@RiotDataConverterRepository.QueueIdToString(gameResult.QueueId)</td>
-            <td><img src=@GetChampionImagePath(gameResult.Champion) class="rounded-circle ms-3" width="50"></td>
+            <td><img src=@ComponentUtility.GetChampionImagePath(gameResult.TargetPlayerData.Champion) class="rounded-circle ms-3" width="50"></td>
             <td>@RiotDataConverterRepository.WinToString(gameResult.Win)</td>
             <td colspan="6">
-                @foreach (var itemId in gameResult.Items)
+                @foreach (var itemId in gameResult.TargetPlayerData.Items)
                 {
-                    <img src=@GetItemImagePath(itemId) width="50">
+                    <img src=@ComponentUtility.GetItemImagePath(itemId) width="50">
                 }
             </td>
-            <td><img src=@GetItemImagePath(gameResult.Ward) width="50"></td>
-            <td><button class="btn btn-primary" @onclick="x => NavigateToGameDetail(_selectedRegion, gameResult.GameId, gameResult.TargetId, gameResult.OpponentId)">See Detail</button></td>
+            <td><img src=@ComponentUtility.GetItemImagePath(gameResult.TargetPlayerData.Ward) width="50"></td>
+            <td><button class="btn btn-primary" @onclick="x => NavigateToGameDetail(_selectedRegion, gameResult.MatchId, gameResult.TargetId, gameResult.OpponentId)">See Detail</button></td>
         </tr>
     }
 </table>
@@ -123,7 +123,7 @@
         try
         {
             var tags = GameResultIndexViewModel.GetTags(_selectedQueueType, _selectedPosition, _inputedChampionName);
-            await GameResultIndexViewModel.GetGameResultEntitiesBySummonerName(_selectedRegion, _enteredSummonerName, tags, count);
+            await GameResultIndexViewModel.GetGameResultEntitiesBySummonerNameAsync(_selectedRegion, _enteredSummonerName, tags, count);
         }
         catch (RiotSharpException riotSharpException)
         {
@@ -139,26 +139,6 @@
         }
     }
 
-    private string GetChampionImagePath(string championName)
-    {
-        return GameResultIndexViewModel.GetChampionImagePath(championName);
-    }
-
-    private string GetItemImagePath(long itemId)
-    {
-        return GameResultIndexViewModel.GetItemImagePath(itemId);
-    }
-
-    private void ActivateSearchForm()
-    {
-        _championSearchFormClassString = "show";
-    }
-
-    private void DeactivateSearchForm()
-    {
-        _championSearchFormClassString = string.Empty;
-    }
-
     private void UpdataChampionList(string? championName)
     {
         if (championName == null)
@@ -168,16 +148,15 @@
         _championList = ChampionsDataEntity.Data.Values.Where(x => x.Id.Contains(championName, StringComparison.OrdinalIgnoreCase)).ToList();
     }
 
+    private void ClickChampionListRow()
+    {
+        ClickChampionListRow(GameResultIndexViewModel.DefaultInputedChampionName);
+    }
+
     private void ClickChampionListRow(string championId)
     {
         _inputedChampionName = championId;
-        DeactivateSearchForm();
-    }
-
-    private void ClickChampionListRow()
-    {
-        _inputedChampionName = GameResultIndexViewModel.DefaultInputedChampionName;
-        DeactivateSearchForm();
+        UpdataChampionList(championId);
     }
 
     private async void FocusInputForm()
@@ -193,9 +172,9 @@
         await _inputFormReference.FocusAsync();
     }
 
-    private void NavigateToGameDetail(int regionNum, string gameId, int targetId, int opponentId)
+    private void NavigateToGameDetail(int regionNum, string matchId, int targetId, int opponentId)
     {
         var region = (Region)regionNum;
-        NavigationManager.NavigateTo($"/{region}/game={gameId}_target={targetId}_opponent={opponentId}");
+        NavigationManager.NavigateTo($"/{region}/game={matchId}_target={targetId}_opponent={opponentId}");
     }
 }

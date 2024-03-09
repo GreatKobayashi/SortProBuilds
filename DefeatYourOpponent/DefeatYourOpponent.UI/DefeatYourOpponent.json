@@ -3,7 +3,7 @@
     "BaseUrl": "https://localhost:7058",
     "ApiUrls": {
       "GetGameResults": "api/PostTagsTakeGameResults",
-      "GetGameTimeLine": "api/GetTimeLine/{0}"
+      "GetGameDetail": "api/GetGameDetail/{0}?region={1}&targetId={2}&opponentId={3}"
     }
   },
   "RiotApiErrorMessageListFilePath": "RiotApiErrorMessageList.json",

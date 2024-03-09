@@ -4,7 +4,6 @@ using RiotApiController.Domain.Repositories;
 using RiotApiController.Infrastructure;
 using RiotSharp;
 using RiotSharp.Misc;
-using System.Net;
 using System.Text.Json;
 
 namespace RiotApiController.Api.Controllers
@@ -13,7 +12,7 @@ namespace RiotApiController.Api.Controllers
     [ApiController]
     public class RiotApiController : ControllerBase
     {
-        private string _apiKey = "RGAPI-24b3a057-7a51-468a-8bfe-5caf936e655f";
+        private string _apiKey = "RGAPI-ac485388-1729-4bf9-9faa-a6716fc9e5de";
 
         private GameResultRepository _gameResultRepository;
 
@@ -39,14 +38,14 @@ namespace RiotApiController.Api.Controllers
             }
         }
 
-        [Route("GetTimeLine/{gameId}")]
+        [Route("GetGameDetail/{matchId}")]
         [HttpGet]
-        public async Task<string> GetTimeLineAsync([FromQuery] Region region, string gameId, [FromQuery] int targetId, [FromQuery] int opponentId)
+        public async Task<string> GetGameDetailAsync([FromQuery] Region region, string matchId, [FromQuery] int targetId, [FromQuery] int opponentId)
         {
             try
             {
-                var timeLine = await _gameResultRepository.GetTimeLine(region, gameId, targetId, opponentId);
-                return JsonSerializer.Serialize(timeLine);
+                var gameDetail = await _gameResultRepository.GetGetGameDetailAsync(region, matchId, targetId, opponentId);
+                return JsonSerializer.Serialize(gameDetail);
             }
             catch (Exception)
             {

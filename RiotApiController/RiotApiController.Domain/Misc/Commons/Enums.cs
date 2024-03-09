@@ -1,6 +1,6 @@
 ﻿namespace RiotApiController.Domain.Misc.Commons
 {
-    public enum Position
+    public enum TeamPosition
     {
         TOP = 1,
         JUNGLE = 2,

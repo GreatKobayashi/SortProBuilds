@@ -5,6 +5,6 @@ namespace DefeatYourOpponent.Domain.Repositories
 {
     public interface ITimeLineRepository
     {
-        public TimeLineEntity GetTimeLineAsync(Region region, string gameId, int targetId, int opponentId);
+        public Task<GameDetailEntity> GetGameDetailAsync(Region region, string matchId, int targetId, int opponentId);
     }
 }
