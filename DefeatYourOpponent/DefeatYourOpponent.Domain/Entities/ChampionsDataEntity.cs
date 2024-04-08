@@ -2,6 +2,7 @@
 
 namespace DefeatYourOpponent.Domain.Entities
 {
+    // DataDragonのJsonデシリアライズ用
     public class ChampionsDataEntity
     {
         [JsonInclude]
