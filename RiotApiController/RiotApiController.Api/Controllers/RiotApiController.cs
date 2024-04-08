@@ -12,7 +12,7 @@ namespace RiotApiController.Api.Controllers
     [ApiController]
     public class RiotApiController : ControllerBase
     {
-        private string _apiKey = "RGAPI-ac485388-1729-4bf9-9faa-a6716fc9e5de";
+        private string _apiKey = "RGAPI-41d0978e-71b7-4fc0-8039-a7217c9bb840";
 
         private GameResultRepository _gameResultRepository;
 

@@ -1,5 +1,4 @@
-﻿using RiotApiController.Domain.Misc.Commons;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace RiotApiController.Domain.Entities.Commons
 {
@@ -16,7 +15,7 @@ namespace RiotApiController.Domain.Entities.Commons
         public PlayerDataEntity TargetPlayerData { get; }
 
         [JsonConstructor]
-        public GameResultEntity(string matchId,int queueId,int targetId,int opponentId,bool win,string opponentChampion,PlayerDataEntity targetPlayerData)
+        public GameResultEntity(string matchId, int queueId, int targetId, int opponentId, bool win, string opponentChampion, PlayerDataEntity targetPlayerData)
         {
             MatchId = matchId;
             QueueId = queueId;

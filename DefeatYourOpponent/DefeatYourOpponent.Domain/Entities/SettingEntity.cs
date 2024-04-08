@@ -14,18 +14,30 @@ namespace DefeatYourOpponent.Domain.Entities
         public string ChampionsDataFilePath { get; private set; }
         [JsonInclude]
         public string QueueTypeListFilePath { get; private set; }
+        [JsonInclude]
+        public int ChampionImageWidth { get; private set; }
+        [JsonInclude]
+        public int KillIconWidth { get; private set; }
+        [JsonInclude]
+        public int AssistChampionImageWidth { get; private set; }
 
         public SettingEntity(RiotControllerSettingEntity riotControllerSetting,
             string riotApiErrorMessageListFilePath,
             string internalErrorMessageListFilePath,
             string championsDataFilePath,
-            string queueTypeListFilePath)
+            string queueTypeListFilePath,
+            int championImageWidth,
+            int killIconWidth,
+            int assistChampionImageWidth)
         {
             RiotControllerSetting = riotControllerSetting;
             RiotApiErrorMessageListFilePath = riotApiErrorMessageListFilePath;
             InternalErrorMessageListFilePath = internalErrorMessageListFilePath;
             ChampionsDataFilePath = championsDataFilePath;
             QueueTypeListFilePath = queueTypeListFilePath;
+            ChampionImageWidth = championImageWidth;
+            KillIconWidth = killIconWidth;
+            AssistChampionImageWidth = assistChampionImageWidth;
         }
     }
 }

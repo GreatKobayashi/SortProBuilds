@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DefeatYourOpponent.Domain.Helper
+﻿namespace DefeatYourOpponent.Domain.Helper
 {
     public static class IListExtensions
     {

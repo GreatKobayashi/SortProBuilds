@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyModel;
-using RiotApiController.Domain.Entities.Commons;
+﻿using RiotApiController.Domain.Entities.Commons;
 using RiotApiController.Domain.Helper;
 using RiotApiController.Domain.Logics;
 using RiotApiController.Domain.Repositories;
@@ -64,7 +63,6 @@ namespace RiotApiController.Infrastructure.WebApi
 
         public async Task<GameDetailEntity> GetGetGameDetailAsync(Region region, string matchId, int targetId, int opponentId)
         {
-            // JP1_434966173
             region = region.ToArea();
             var defaultTimeLine = await _riotApi.Match.GetMatchTimelineAsync(region, matchId);
             var formatedTimeLine = new TimeLineEntity();
@@ -82,16 +80,17 @@ namespace RiotApiController.Infrastructure.WebApi
                     }
 
                     if (evnt.EventType == MatchEventType.ChampionKill &&
-                        (evnt.ParticipantId == targetId || evnt.ParticipantId == opponentId ||
+                        (evnt.KillerId == targetId || evnt.KillerId == opponentId ||
                         evnt.VictimId == targetId || evnt.VictimId == opponentId ||
                         (evnt.AssistingParticipantIds != null && (evnt.AssistingParticipantIds.Contains(targetId) || evnt.AssistingParticipantIds.Contains(opponentId)))))
                     {
                         var killData = new EventDataEntity(evnt.Timestamp);
-                        killData.EventData.Add(nameof(evnt.ParticipantId), evnt.ParticipantId);
+                        killData.EventData.Add(nameof(evnt.KillerId), evnt.KillerId);
                         killData.EventData.Add(nameof(evnt.VictimId), evnt.VictimId);
                         if (evnt.AssistingParticipantIds != null)
                         {
-                            killData.EventData.Add(nameof(evnt.AssistingParticipantIds), evnt.AssistingParticipantIds);
+                            killData.EventData.Add(
+                                nameof(evnt.AssistingParticipantIds), string.Join(',', evnt.AssistingParticipantIds));
                         }
                         formatedTimeLine.KillData.Add(killData);
                     }
@@ -114,13 +113,13 @@ namespace RiotApiController.Infrastructure.WebApi
             }
 
             var match = await _riotApi.Match.GetMatchAsync(region, matchId);
-            var targetPlayerData = GetPlayerDataEntity(match.Info.Participants.First(x => x.ParticipantId == targetId));
-            var opponentPlayerData = GetPlayerDataEntity(match.Info.Participants.First(x => x.ParticipantId == opponentId));
-
-            return new(formatedTimeLine, new()
+            var playerDataList = new List<PlayerDataEntity>();
+            foreach (var participant in match.Info.Participants)
             {
-                targetPlayerData, opponentPlayerData
-            });
+                playerDataList.Add(GetPlayerDataEntity(participant));
+            }
+
+            return new(formatedTimeLine, playerDataList);
         }
 
         private PlayerDataEntity GetPlayerDataEntity(Participant targetInfo)

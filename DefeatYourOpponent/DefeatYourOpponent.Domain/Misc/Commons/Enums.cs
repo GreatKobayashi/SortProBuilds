@@ -1,4 +1,4 @@
-﻿namespace RiotApiController.Domain.Misc
+﻿namespace DefeatYourOpponent.Domain.Misc
 {
     public enum TeamPosition
     {
@@ -14,11 +14,15 @@
         POSITION,
     }
 
-
-
     public enum QueueType
     {
         RANKED = 420,
         NORMAL = 490
+    }
+
+    public enum EventType
+    {
+        PURCHASE,
+        KILL
     }
 }

@@ -2,16 +2,20 @@
 {
     public class TimeLineEntity
     {
-        private static readonly string _participantIdKey = "ParticipantId";
-        private static readonly string _totalGoldKey = "TotalGold";
+        public static string ParticipantIdKey { get; } = "ParticipantId";
+        public static string TotalGoldKey { get; } = "TotalGold";
+        public static string PurchaseKey { get; } = "ItemId";
+        public static string KillerKey { get; } = "KillerId";
+        public static string VictimKey { get; } = "VictimId";
+        public static string AssistKey { get; } = "AssistingParticipantIds";
 
         public List<EventDataEntity> PurchaseData { get; set; } = new List<EventDataEntity>();
         public List<EventDataEntity> GoldData { get; set; } = new List<EventDataEntity>();
         public List<EventDataEntity> KillData { get; set; } = new List<EventDataEntity>();
 
-        public int[] GetTargetTotalGoldChanges(string targetId)
+        public int[] GetTotalGoldChanges(string participantId)
         {
-            var totalGoldEvent = GoldData.Where(x => x.EventData[_participantIdKey] == targetId).Select(x => x.EventData[_totalGoldKey]).ToArray();
+            var totalGoldEvent = GoldData.Where(x => x.EventData[ParticipantIdKey] == participantId).Select(x => x.EventData[TotalGoldKey]).ToArray();
             return Array.ConvertAll(totalGoldEvent, int.Parse);
         }
     }

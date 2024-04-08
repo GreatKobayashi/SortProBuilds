@@ -1,8 +1,8 @@
 ﻿using DefeatYourOpponent.Domain.Entities;
 using DefeatYourOpponent.Domain.Entities.Commons;
 using DefeatYourOpponent.Domain.Exceptions;
+using DefeatYourOpponent.Domain.Misc;
 using DefeatYourOpponent.Domain.Repositories;
-using RiotApiController.Domain.Misc;
 using RiotSharp;
 using RiotSharp.Misc;
 using System.Net;

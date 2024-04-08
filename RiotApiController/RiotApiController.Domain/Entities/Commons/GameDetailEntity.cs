@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RiotApiController.Domain.Entities.Commons
+﻿namespace RiotApiController.Domain.Entities.Commons
 {
     public class GameDetailEntity
     {

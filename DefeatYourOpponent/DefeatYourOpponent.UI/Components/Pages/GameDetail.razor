@@ -5,20 +5,21 @@
 @using DefeatYourOpponent.Domain.Entities.Commons
 @using DefeatYourOpponent.Domain.Helper
 @using DefeatYourOpponent.Domain.Misc
+@using DefeatYourOpponent.UI.Components.Layout
 @using DefeatYourOpponent.UI.ViewModel
 @using RiotSharp.Misc
 @inject GameDetailViewModel GameDetailViewModel
 
 <h3>GameDetail</h3>
 <div class="d-flex flex-row justify-content-center">
-    @if (_targetDataEntity != null && _opponentDataEntity != null)
+    @if (_targetData != null && _opponentData != null)
     {
         <div class="col-auto">
-            <img src=@ComponentUtility.GetChampionImagePath(_targetDataEntity.Champion) class="rounded-circle" width="200">
+            <img src=@ComponentUtility.GetChampionImagePath(_targetData.Champion) class="rounded-circle" width="200">
         </div>
         <div class="col-auto d-flex justify-content-center align-items-center p-3"><h2>vs.</h2></div>
         <div class="col-auto">
-            <img src=@ComponentUtility.GetChampionImagePath(_opponentDataEntity.Champion) class="rounded-circle" width="200">
+            <img src=@ComponentUtility.GetChampionImagePath(_opponentData.Champion) class="rounded-circle" width="200">
         </div>
     }
     else
@@ -36,6 +37,17 @@
         <Chart Config="_config" @ref="_chart"></Chart>
     </div>
 </div>
+
+@if (_timeLine != null)
+{
+    <EventTimeLine EventType="@_eventType"
+                   TimeLine="_timeLine"
+                   TargetId="@TargetId"
+                   OpponentId="@OpponentId"
+                   PlayerDataList="_playerDataList"
+                   EventTimeLineAdditionalStyle="width:50vw;">
+    </EventTimeLine>
+}
 
 
 @code {
@@ -104,10 +116,17 @@
         }
     };
 
+    private List<PlayerDataEntity>? _playerDataList;
+    private PlayerDataEntity? _targetData;
+    private PlayerDataEntity? _opponentData;
     private TimeLineEntity? _timeLine;
-    private GameDetailEntity? _gameDetailEntity;
-    private PlayerDataEntity? _targetDataEntity;
-    private PlayerDataEntity? _opponentDataEntity;
+
+    private EventType _eventType = EventType.KILL;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -116,27 +135,30 @@
             if (firstRender)
             {
                 var region = (Region)Enum.Parse(typeof(Region), RegionStr);
-                _gameDetailEntity = await GameDetailViewModel.GetGameDetailAsync(region, MatchId, int.Parse(TargetId), int.Parse(OpponentId)).ConfigureAwait(false);
-                _timeLine = _gameDetailEntity.TimeLine;
-                _targetDataEntity = _gameDetailEntity.PlayerDataList.First(x => x.ParticipantId == int.Parse(TargetId));
-                _opponentDataEntity = _gameDetailEntity.PlayerDataList.First(x => x.ParticipantId == int.Parse(OpponentId));
-                var targetTotalGoldChanges = _timeLine.GetTargetTotalGoldChanges(TargetId);
+                var gameDetailEntity = await GameDetailViewModel.GetGameDetailAsync(region, MatchId, int.Parse(TargetId), int.Parse(OpponentId)).ConfigureAwait(false);
+                _timeLine = gameDetailEntity.TimeLine;
+                _playerDataList = gameDetailEntity.PlayerDataList;
+                _targetData = _playerDataList.First(x => x.ParticipantId == int.Parse(TargetId));
+                _opponentData = _playerDataList.First(x => x.ParticipantId == int.Parse(OpponentId));
+                var targetTotalGoldChanges = _timeLine.GetTotalGoldChanges(TargetId);
                 var targetTotalGoldData = new LineDataset<int>(targetTotalGoldChanges)
-                    {
-                        Label = "You",
-                        BackgroundColor = ColorUtil.FromDrawingColor(Color.FromArgb(10, 54, 162, 235)),
-                        BorderColor = ColorUtil.FromDrawingColor(Color.FromArgb(100, 54, 162, 235)),
-                        Fill = FillingMode.Origin
-                    };
+                {
+                    Label = "You",
+                    BackgroundColor = ColorUtil.FromDrawingColor(Color.FromArgb(10, 54, 162, 235)),
+                    BorderColor = ColorUtil.FromDrawingColor(Color.FromArgb(100, 54, 162, 235)),
+                    Fill = FillingMode.Origin,
+                    LineTension = 0
+                };
 
-                var opponentTotalGoldChanges = _timeLine.GetTargetTotalGoldChanges(OpponentId);
+                var opponentTotalGoldChanges = _timeLine.GetTotalGoldChanges(OpponentId);
                 var opponentTotalGoldData = new LineDataset<int>(opponentTotalGoldChanges)
-                    {
-                        Label = "Opponent",
-                        BackgroundColor = ColorUtil.FromDrawingColor(ChartColors.Red(10)),
-                        BorderColor = ColorUtil.FromDrawingColor(ChartColors.Red(100)),
-                        Fill = FillingMode.Origin
-                    };
+                {
+                    Label = "Opponent",
+                    BackgroundColor = ColorUtil.FromDrawingColor(ChartColors.Red(10)),
+                    BorderColor = ColorUtil.FromDrawingColor(ChartColors.Red(100)),
+                    Fill = FillingMode.Origin,
+                    LineTension = 0
+                };
 
                 _config.Data.Labels.AddRange(Array.ConvertAll(Enumerable.Range(0, targetTotalGoldChanges.Length).ToArray(), x => x.ToString()));
                 _config.Data.Datasets.Add(targetTotalGoldData);

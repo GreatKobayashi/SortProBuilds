@@ -5,8 +5,8 @@ namespace DefeatYourOpponent.Domain.Entities
 {
     public class RiotControllerSettingEntity
     {
-        private string _getGameResultsApiUrlKey = "GetGameResults"; 
-            private string _getGameDetailApiUrlKey = "GetGameDetail";
+        private string _getGameResultsApiUrlKey = "GetGameResults";
+        private string _getGameDetailApiUrlKey = "GetGameDetail";
 
         [JsonInclude]
         public string BaseUrl { get; private set; }

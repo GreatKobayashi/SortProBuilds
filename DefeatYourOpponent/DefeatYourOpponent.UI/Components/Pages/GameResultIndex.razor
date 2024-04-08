@@ -3,9 +3,9 @@
 @using DefeatYourOpponent.Domain.Entities.Commons
 @using DefeatYourOpponent.Domain.Exceptions
 @using DefeatYourOpponent.Domain.Logics
+@using DefeatYourOpponent.Domain.Misc
 @using DefeatYourOpponent.Domain.Repositories
 @using DefeatYourOpponent.UI.ViewModel
-@using RiotApiController.Domain.Misc
 @using RiotSharp
 @using RiotSharp.Misc
 @rendermode InteractiveServer
@@ -103,7 +103,6 @@
     private int _selectedRegion = -1;
     private int _selectedQueueType;
     private int _selectedPosition;
-    private int _selectedChampion;
     private bool _includeSpecialGame = false;
     private string _championSearchFormClassString = string.Empty;
     private string _inputedChampionName = string.Empty;

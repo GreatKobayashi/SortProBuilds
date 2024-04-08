@@ -9,5 +9,8 @@
   "RiotApiErrorMessageListFilePath": "RiotApiErrorMessageList.json",
   "InternalErrorMessageListFilePath": "InternalErrorMessageList.json",
   "ChampionsDataFilePath": "Data/champion.json",
-  "QueueTypeListFilePath": "Data/queues.json"
+  "QueueTypeListFilePath": "Data/queues.json",
+  "ChampionImageWidth": 50,
+  "KillIconWidth": 35,
+  "AssistChampionImageWidth": 35
 }

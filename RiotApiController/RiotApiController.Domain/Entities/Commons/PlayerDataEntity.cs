@@ -1,5 +1,4 @@
 ﻿using RiotApiController.Domain.Misc.Commons;
-using RiotSharp.Endpoints.ChampionEndpoint;
 using System.Text.Json.Serialization;
 
 namespace RiotApiController.Domain.Entities.Commons
@@ -15,7 +14,7 @@ namespace RiotApiController.Domain.Entities.Commons
         public int Death { get; }
         public int Assist { get; }
 
-        public PlayerDataEntity(int participantId, string champion, string position, List<long> items, long ward, long kill, long death, long assist) 
+        public PlayerDataEntity(int participantId, string champion, string position, List<long> items, long ward, long kill, long death, long assist)
             : this(participantId, champion, Enum.Parse<TeamPosition>(position), items.ConvertAll(x => (int)x), (int)ward, (int)kill, (int)death, (int)assist)
         {
         }

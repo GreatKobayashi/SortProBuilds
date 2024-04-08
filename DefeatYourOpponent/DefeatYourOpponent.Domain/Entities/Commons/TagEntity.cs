@@ -1,4 +1,4 @@
-﻿using RiotApiController.Domain.Misc;
+﻿using DefeatYourOpponent.Domain.Misc;
 
 namespace DefeatYourOpponent.Domain.Entities.Commons
 {

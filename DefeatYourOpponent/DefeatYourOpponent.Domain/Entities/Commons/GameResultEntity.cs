@@ -1,5 +1,4 @@
-﻿using RiotApiController.Domain.Misc;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace DefeatYourOpponent.Domain.Entities.Commons
 {

@@ -21,6 +21,7 @@ builder.Services.AddSingleton(Factories.CreateRiotDataConverterRepository(Shared
 
 builder.Services.AddScoped<GameResultIndexViewModel>();
 builder.Services.AddScoped<GameDetailViewModel>();
+builder.Services.AddScoped<EventTimeLineViewModel>();
 
 var app = builder.Build();
 
