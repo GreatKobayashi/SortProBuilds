@@ -1,0 +1,15 @@
+{
+  "UnknownError": {
+    "UnknownRegion": "An Unknown error has occuered. Please inform to administrator.",
+    "EN": "An Unknown error has occuered.",
+    "JP": "予期せぬエラーが発生しました。"
+  },
+  "Invalid Api key.": {
+    "EN": "Api key error has occuered. Please inform to administrator.",
+    "JP": "APIキーエラーが発生しました。管理者に連絡してください。"
+  },
+  "Over the request limit.": {
+    "EN": "The access limit has been reached. Please wait a few minutes and try again.",
+    "JP": "アクセス上限に達しました。時間をおいて再度お試しください。"
+  }
+}

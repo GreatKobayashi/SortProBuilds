@@ -1,0 +1,95 @@
+﻿@rendermode @(new InteractiveServerRenderMode(false))
+@using DefeatYourOpponent.Domain
+@using DefeatYourOpponent.Domain.Entities
+@using DefeatYourOpponent.Domain.Misc
+@using DefeatYourOpponent.UI.ViewModel
+
+
+<div class="text-center">
+    <table class="border rounded" style="position:relative; left:0px; width:@(Shared.SettingEntity.ChartWidth + _championImageWidth)px;">
+        @if (MatchDetailViewModel.IsInitialized)
+        {
+            <tr style="height:@(_timeLineHeight)px;">
+                <td width="@_championImageWidth">
+                    <img src=@CDragon.ChampionImage.GetSquareIconPath(MatchDetailViewModel.YourChampion!.Id) class="rounded-circle m-2" width="@_championImageWidth">
+                </td>
+                <td style="position:relative; width:@(Shared.SettingEntity.ChartWidth)px;">
+                    <EventItem EventFrames="MatchDetailViewModel.YourEventFrames.Value"
+                               TargetChampion="MatchDetailViewModel.YourChampion"
+                                TimeLineBarPadding="_timeLineBarPadding" />
+                </td>
+            </tr>
+            <tr style="height:@(_timeLineHeight)px;">
+                <td width ="@_championImageWidth">
+                    <img src=@CDragon.ChampionImage.GetSquareIconPath(MatchDetailViewModel.OpponentChampion!.Id) class="rounded-circle m-2" width="@_championImageWidth">
+                </td>
+                <td style="position:relative;">
+                    <EventItem EventFrames="MatchDetailViewModel.OpponentEventFrames.Value"
+                               TargetChampion="MatchDetailViewModel.OpponentChampion"
+                                TimeLineBarPadding="_timeLineBarPadding" />
+                </td>
+            </tr>
+        }
+        @if (_timeBar != null)
+        {
+            <tr style="height:50px;">
+                <td></td>
+                <td style="position:relative; z-index:0;">
+                    @foreach (var eventTimeTick in _timeBar.EventTimeTicks)
+                    {
+                        <div style="position:absolute; padding-left:@(_timeLineBarPadding)px; left:@(eventTimeTick)px; display:inline-block; top:@(-(_timeLineHeight * 2) - 30)px;">
+                            <div style="background-color:lightblue; width:2px; height:@((_timeLineHeight * 2) + _timeLineVerticalBarSizePadding)px;"></div>
+                            <span style="background-color:white; margin-left:-20px;">@_timeBar.GetTickLabel(eventTimeTick)</span>
+                        </div>
+                    }
+                </td>
+            </tr>
+        }
+    </table>
+
+    <div class="row mx-3" style="margin-top:-1px; position:relative; z-index:3000;">
+        <label class="col border rounded-bottom @GetTabClass(EventType.Kill)" role="button" @onclick="() => OnEventTabClick(EventType.Kill)">Kill Event</label>
+        <label class="col border rounded-bottom @GetTabClass(EventType.Purchase)" role="button" @onclick="() => OnEventTabClick(EventType.Purchase)">Purchase Event</label>
+    </div>
+</div>
+
+
+@code
+{
+    private static readonly int _timeLineHeight = 50;
+    private static readonly int _championImageWidth = 50;
+
+    private TimeBarEntity? _timeBar;
+
+    private int _timeLineBarPadding = 28;
+    private int _timeLineVerticalBarSizePadding = 30;
+
+#pragma warning disable CS8618
+    [Parameter]
+    public string? EventTimeLineAdditionalStyle { get; set; }
+    [CascadingParameter(Name = "MatchDetailViewModel")]
+    public MatchDetailViewModel MatchDetailViewModel { get; set; }
+#pragma warning restore CS8618
+
+    protected override void OnInitialized()
+    {
+        _timeBar = new TimeBarEntity(MatchDetailViewModel.Match.Value.Meta.GameDuration.TotalMinutes);
+    }
+
+    private void OnEventTabClick(EventType eventType)
+    {
+        MatchDetailViewModel.EventTypeSelected.Value = eventType;
+    }
+
+    private string GetTabClass(EventType eventType)
+    {
+        if (MatchDetailViewModel.EventTypeSelected.Value == eventType)
+        {
+            return "border-top-0 bg-white";
+        }
+        else
+        {
+            return "bg-light";
+        }
+    }
+}

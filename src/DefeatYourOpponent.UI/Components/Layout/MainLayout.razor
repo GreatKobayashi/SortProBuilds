@@ -1,0 +1,25 @@
+﻿@inherits LayoutComponentBase
+
+<div class="page">
+    <div class="d-flex flex-column w-100">
+        <NavBar />
+        <main class="d-flex justify-content-center">
+            <article class="content px-4" style="width:1200px;">
+                <ErrorBoundary>
+                    <ChildContent>
+                        @Body
+                    </ChildContent>
+                    <ErrorContent>
+                        <p class="alert-warning">Critical Error has occuered. @context.Message</p>
+                    </ErrorContent>
+                </ErrorBoundary>
+            </article>
+        </main>
+    </div>
+</div>
+
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>

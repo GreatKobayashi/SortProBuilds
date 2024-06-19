@@ -1,0 +1,27 @@
+{
+  "予期せぬエラー": {
+    "UnknownRegion": "An Unknown error has occuered. Please inform to administrator.",
+    "EN": "An Unknown error has occuered.",
+    "JP": "予期せぬエラーが発生しました。"
+  },
+  "サーバー接続失敗": {
+    "EN": "Connection to the internal server failed. If the problem does not improve after a few minutes, please contact the administrator.",
+    "JP": "内部サーバーとの接続に失敗しました。数分経っても改善しない場合、管理者に連絡してください。"
+  },
+  "一致するチャンピオン名なし": {
+    "EN": "No champions matching the input name. Please check your input.",
+    "JP": "入力名に一致するチャンピオンがいません。入力内容を確認してください。"
+  },
+  "サモナー名未入力": {
+    "EN": "Enter a summoner name.",
+    "JP": "サモナー名を入力してください。"
+  },
+  "地域未選択": {
+    "EN": "Select region.",
+    "JP": "地域を選択してください。"
+  },
+  "該当マッチ数不足": {
+    "EN": "Few games that meet the specified criteria. Please search with different criteria.",
+    "JP": "指定の条件を満たすゲームが少ないです。条件を変えて検索してください。"
+  }
+}

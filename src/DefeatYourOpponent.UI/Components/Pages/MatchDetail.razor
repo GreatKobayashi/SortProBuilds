@@ -1,0 +1,225 @@
+﻿@page "/matches/{Region}/{MatchId}"
+@rendermode @(new InteractiveServerRenderMode(false))
+@using ChartJs.Blazor.Common.Axes.Ticks
+@using ChartJs.Blazor.LineChart
+@using DefeatYourOpponent.Domain
+@using DefeatYourOpponent.Domain.Helper
+@using DefeatYourOpponent.Domain.Misc
+@using DefeatYourOpponent.Domain.Logics
+@using DefeatYourOpponent.UI.Components.Layout
+@using DefeatYourOpponent.UI.ViewModel
+@inject MatchDetailViewModel MatchDetailViewModel
+@implements IDisposable
+
+<h3>GameDetail</h3>
+<div class="d-flex flex-row justify-content-center">
+    @if (MatchDetailViewModel.YourChampion != null && MatchDetailViewModel.OpponentChampion != null && MatchDetailViewModel.IsInitialized)
+    {
+        <div class="col-auto">
+            <img src=@CDragon.ChampionImage.GetSquareIconPath(MatchDetailViewModel.YourChampion.Id) class="rounded-circle" width="200">
+        </div>
+        <div class="col-auto d-flex justify-content-center align-items-center p-3"><h2>vs.</h2></div>
+        <div class="col-auto">
+            <img src=@CDragon.ChampionImage.GetSquareIconPath(MatchDetailViewModel.OpponentChampion.Id) class="rounded-circle" width="200">
+        </div>
+    }
+    else
+    {
+        <div class="col-auto">
+        </div>
+        <div class="col-auto d-flex justify-content-center align-items-center p-3"><h2>vs.</h2></div>
+        <div class="col-auto">
+        </div>
+    }
+</div>
+
+<div class="d-flex flex-column justify-content-center">
+    <div class="d-flex justify-content-end" style="width:95%;" >
+        <select class="form-select form-select-sm w-25" @bind="GraphContentSelected">
+            @foreach (var content in Enum.GetValues<GraphContent>())
+            {
+                <option value=@((int)content)>@content</option>
+            }
+        </select>
+    </div>
+    <div style="width:@(Shared.SettingEntity.ChartWidth)px; margin-left:@GetGraphLeftMargin()px;">
+        <Chart Config="_config" @ref="_chart"></Chart>
+    </div>
+</div>
+
+@if (MatchDetailViewModel.TimeLine.Value != null)
+{
+    <CascadingValue Value="MatchDetailViewModel" Name="MatchDetailViewModel">
+        <div class="d-flex flex-row" style="margin-left:45px;">
+            <EventTimeLine EventTimeLineAdditionalStyle="width:50vw;" />
+        </div>
+    </CascadingValue>
+}
+
+
+@code
+{
+    private Chart? _chart;
+
+    private LineConfig _config = new LineConfig()
+        {
+            Options = new LineOptions
+            {
+                Responsive = true,
+                Title = new OptionsTitle
+                {
+                    Display = true,
+                    Text = "Total gold changes"
+                },
+                Tooltips = new Tooltips
+                {
+                    Mode = InteractionMode.Nearest,
+                    Intersect = true
+                },
+                Hover = new Hover
+                {
+                    Mode = InteractionMode.Nearest,
+                    Intersect = true
+                },
+                Scales = new Scales
+                {
+                    XAxes = new List<CartesianAxis>
+                {
+                    new CategoryAxis
+                    {
+                        ScaleLabel = new ScaleLabel
+                        {
+                            LabelString = "Minute",
+                            Display = true
+                        },
+                        Ticks = new CategoryTicks()
+                        {
+                            AutoSkip = true
+                        }
+                    }
+                },
+                    YAxes = new List<CartesianAxis>
+                {
+                    new LinearCartesianAxis
+                    {
+                        ScaleLabel = new ScaleLabel
+                        {
+                            LabelString = "Total Gold",
+                            Display = true
+                        }
+                    }
+                }
+                }
+            }
+        };
+
+    private readonly CompositeDisposable _disposables = new();
+
+    private int _graphContentSelected;
+    private int GraphContentSelected
+    {
+        get => _graphContentSelected;
+        set
+        {
+            _graphContentSelected = value;
+            MatchDetailViewModel.GraphContentSelected.Value = (GraphContent)value;
+        }
+    }
+
+#pragma warning disable CS8618
+    [Parameter]
+    public string MatchId { get; set; }
+    [Parameter]
+    public string Region { get; set; }
+#pragma warning restore CS8618
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string? YourId { get; set; }
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string? OpponentId { get; set; }
+
+
+    protected override void OnInitialized()
+    {
+        _chart = new Chart();
+        MatchDetailViewModel.GraphData.Subscribe(async x =>
+        {
+            if (x.Item1 == null || x.Item2 == null || _chart.Config == null)
+            {
+                return;
+            }
+            var yourGraph = new LineDataset<int>(x.Item1)
+            {
+                Label = "You",
+                BackgroundColor = ColorUtil.FromDrawingColor(Color.FromArgb(10, 54, 162, 235)),
+                BorderColor = ColorUtil.FromDrawingColor(Color.FromArgb(100, 54, 162, 235)),
+                Fill = FillingMode.Origin,
+                LineTension = 0
+            };
+            var opponentGraph = new LineDataset<int>(x.Item2)
+            {
+                Label = "Opponent",
+                BackgroundColor = ColorUtil.FromDrawingColor(ChartColors.Red(10)),
+                BorderColor = ColorUtil.FromDrawingColor(ChartColors.Red(100)),
+                Fill = FillingMode.Origin,
+                LineTension = 0
+            };
+            _config.Data.Datasets.Clear();
+            _config.Data.Labels.Clear();
+            _config.Data.Labels.AddRange(Array.ConvertAll(Enumerable.Range(0, x.Item1.Count).ToArray(), y => y.ToString()));
+            _config.Data.Datasets.Add(yourGraph);
+            _config.Data.Datasets.Add(opponentGraph);
+            if (_chart != null)
+            {
+                await _chart.Update();
+            }
+            await InvokeAsync(StateHasChanged);
+        })
+        .AddTo(_disposables);
+    }
+
+    private int GetGraphLeftMargin()
+    {
+        switch (MatchDetailViewModel.GraphData.Value.Item1?.Max())
+        {
+            case >= 10000:
+                return 72;
+            case >= 1000:
+                return 79;
+            case >= 100:
+                return 85;
+            default:
+                return 90;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender && _chart != null)
+            {
+                int yourId, opponentId;
+                if (YourId == null || OpponentId == null || !int.TryParse(YourId, out yourId) || !int.TryParse(OpponentId, out opponentId))
+                {
+                    throw new InternalException("クエリ不正");
+                }
+
+                var region = Enum.Parse<Region>(Region);
+                await MatchDetailViewModel.InitializeAsync(region, MatchId, yourId, opponentId).ConfigureAwait(false);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Write(ex);
+        }
+    }
+
+    public void Dispose()
+    {
+        MatchDetailViewModel.OnDispose();
+        _disposables.Dispose();
+    }
+}

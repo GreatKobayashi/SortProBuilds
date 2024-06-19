@@ -1,0 +1,204 @@
+﻿@using DefeatYourOpponent.Domain.Entities
+@using DefeatYourOpponent.Domain.Misc
+@using DefeatYourOpponent.Domain.Repositories
+@using Position = RiotApiWrapper.Misc.Position
+@rendermode InteractiveServer
+@inject IErrorMessageConverterRepository ErrorMessageConverterRepository
+@inject NavigationManager NavigationManager
+
+<h5 class="ms-2" style="color:red;">
+    @_serchErrorMessage
+</h5>
+
+<div class="d-flex flex-row">
+    <select class="form-select mx-2" style="max-width:150px;" @bind="_platformSelected">
+        <option value="-1" hidden selected>Select region</option>
+        @foreach (var platform in Enum.GetValues<Platform>())
+        {
+            <option class="ms-2" value="@((int)platform)">@platform</option>
+        }
+    </select>
+    <input class="form-control mx-2" @bind="_riodIdInputted" placeholder="RiotId" />
+    <input class="form-control mx-2" style="width:200px;" @bind="_tagLineInputted" placeholder="TagLine #@(_platformSelected != -1 ? _defaultTagLines[_platformEnum] : "")" />
+    <button class="btn btn-primary rounded-pill px-3 mx-2" type="button" @onclick="EnterRiotIdAndTagLine">GG</button>
+</div>
+
+<div class="row ms-2 mt-3">
+    <div class="col-auto">
+        <select class="form-select form-select-sm mx-2" @bind="_queueTypeSelected">
+            <option value="-1" selected>All Queue Type</option>
+            @foreach (var queueType in Enum.GetValues<QueueType>())
+            {
+                <option value=@((int)queueType)>@queueType</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <select class="form-select form-select-sm mx-2" @bind="_positionSelected">
+            <option value="-1" selected>All Position</option>
+            @foreach (var position in Enum.GetValues<Position>())
+            {
+                <option value=@((int)position)>@position</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <select class="form-select form-select-sm mx-2" @bind="_resultSelected">
+            <option value="@string.Empty" selected>All Result</option>
+            @foreach (var result in new List<string>(){"WIN", "LOSE"})
+            {
+                <option value=@result>@result</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <div class="input-group" style="margin-top:-1px;">
+            <button class="btn p-0 rounded" type="button" data-bs-toggle="dropdown" aria-expanded="false" @onclick="OnClickChampionNameForm">
+                <input type="text" class="form-control form-control-sm rounded" placeholder="Champion name" @oninput="x => OnInputChampionName(x.Value?.ToString())" @bind-value="_championNameInputted" @ref="_inputFormReference">
+            </button>
+
+            <ul class="dropdown-menu w-100" style="overflow-y: scroll; max-height:300px;">
+                <li><button class="dropdown-item" type="button" @onclick="() => OnClickChampionListRow(null)">@_allChampion</button></li>
+                @foreach (var champion in _championPredictList ?? new())
+                {
+                    <li><button class="dropdown-item" type="button" @onclick="() => OnClickChampionListRow(champion)">@champion.Name</button></li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+
+@code {
+    private static readonly string _allChampion = "All Champion";
+    private static readonly Dictionary<Platform, string> _defaultTagLines = new()
+    {
+        { Platform.BR1,  "BR1" },
+        { Platform.EUN1, "EUNE" },
+        { Platform.EUW1, "EUW" },
+        { Platform.JP1,  "JP1" },
+        { Platform.KR,   "KR1" },
+        { Platform.LA1,  "LA1" },
+        { Platform.LA2,  "LA2" },
+        { Platform.NA1,  "NA1" },
+        { Platform.OC1,  "OCE" },
+        { Platform.PH2,  "PH2" },
+        { Platform.RU,   "RU1" },
+        { Platform.SG2,  "SG2" },
+        { Platform.TH2,  "TH2" },
+        { Platform.TR1,  "TR1" },
+        { Platform.TW2,  "TW2" },
+        { Platform.VN2,  "VN2" },
+    };
+
+    private int _platformSelected = -1;
+    private Platform _platformEnum => (Platform)_platformSelected;
+    private string _riodIdInputted = string.Empty;
+    private string _tagLineInputted = string.Empty;
+
+    private int _queueTypeSelected = -1;
+    private int _positionSelected = -1;
+    private string _resultSelected = string.Empty;
+    private string _championNameInputted = string.Empty;
+    private bool _includeSpecialGame = false;
+    private ElementReference _inputFormReference;
+    private List<ChampionEntity>? _championAllList;
+    private List<ChampionEntity>? _championPredictList;
+
+    private string _serchErrorMessage = string.Empty;
+
+#pragma warning disable CS8618
+    [Parameter]
+    public Platform? PlatformInputted { get; set; }
+    [Parameter]
+    public string? RiotIdInputted { get; set; }
+    [Parameter]
+    public string? TagLineInputted { get; set; }
+    [Parameter]
+    public int? QueueTypeInputted { get; set; }
+    [Parameter]
+    public int? PositionInputted { get; set; }
+    [Parameter]
+    public bool? WinInputted { get; set; }
+    [Parameter]
+    public string? ChampionNameInputted { get; set; }
+#pragma warning restore CS8618
+
+    protected override void OnInitialized()
+    {
+        _championAllList = CDragon.ChampionJson.GetAllEntities();
+        _championAllList = _championAllList.OrderBy(x => x.Name).ToList();
+        _championPredictList = _championAllList;
+
+        _platformSelected = (int?)PlatformInputted ?? _platformSelected;
+        _riodIdInputted = RiotIdInputted ?? string.Empty;
+        _tagLineInputted = TagLineInputted ?? string.Empty;
+        _queueTypeSelected = (int?)QueueTypeInputted ?? _queueTypeSelected;
+        _positionSelected = (int?)PositionInputted ?? _positionSelected;
+        _resultSelected = WinInputted is { } win ? (win ? "WIN" : "LOSE") : string.Empty;
+        _championNameInputted = ChampionNameInputted ?? string.Empty;
+    }
+
+
+    private void EnterRiotIdAndTagLine()
+    {
+        _serchErrorMessage = string.Empty;
+        try
+        {
+            if (_platformSelected == -1)
+            {
+                throw new InternalException("地域未選択");
+            }
+            if (string.IsNullOrEmpty(_riodIdInputted))
+            {
+                throw new InternalException("サモナー名未入力");
+            }
+            var tagLine = _tagLineInputted is { Length: > 0 } input ? input : _defaultTagLines[_platformEnum];
+            NavigationManager.NavigateTo(
+                $"accounts/{(Platform)_platformSelected}/{_riodIdInputted}-{tagLine}?"
+                    + (string.IsNullOrEmpty(_championNameInputted) ? "" : $"Champion={_championNameInputted}")
+                    + (_queueTypeSelected == -1 ? "" : $"&Queue={_queueTypeSelected}")
+                    + (_positionSelected == -1 ? "" : $"&Position={_positionSelected}")
+                    + (_resultSelected == string.Empty ? "" : $"&Win={_resultSelected}"),
+                true);
+        }
+        catch (InternalException exception)
+        {
+            _serchErrorMessage = ErrorMessageConverterRepository.GetMessage(Language.JP, exception);
+            StateHasChanged();
+        }
+    }
+
+    private void OnInputChampionName(string? championNameInputted)
+    {
+        UpdateChampionList(championNameInputted);
+    }
+
+    private async void OnClickChampionNameForm()
+    {
+        await _inputFormReference.FocusAsync();
+    }
+
+    private void OnClickChampionListRow(ChampionEntity? champion)
+    {
+        if (champion == null)
+        {
+            _championNameInputted = _allChampion;
+            UpdateChampionList(null);
+        }
+        else
+        {
+            _championNameInputted = champion.Name;
+            UpdateChampionList(champion.Name);
+        }
+    }
+
+    private void UpdateChampionList(string? championName)
+    {
+        if (championName == null)
+        {
+            _championPredictList = _championAllList;
+            return;
+        }
+        _championPredictList = _championAllList!.Where(x => x.Name.Contains(championName, StringComparison.OrdinalIgnoreCase)).ToList();
+    }
+}

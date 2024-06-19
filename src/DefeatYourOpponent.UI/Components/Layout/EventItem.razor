@@ -1,0 +1,113 @@
+﻿@rendermode @(new InteractiveServerRenderMode(false))
+@using DefeatYourOpponent.Domain
+@using DefeatYourOpponent.Domain.Entities
+@using DefeatYourOpponent.Domain.Logics
+@using DefeatYourOpponent.Domain.Misc
+@using DefeatYourOpponent.UI.ViewModel
+@using RiotApiWrapper.Entities.Match.MatchTimeLine.Events
+
+<div style="position:relative; left:@(TimeLineBarPadding)px;">
+    <div class="border border-info rounded @_show" style="position:absolute; left:@(_eventPosition)px; bottom:20px; transform:translate(-50%, 0%); background-color:white; width:160px; z-index:2000;">
+        @switch (MatchDetailViewModel.EventTypeSelected.Value)
+        {
+            case EventType.Kill:
+                @foreach (var victimImgPath in _victimImgPaths)
+                {
+                    <img src="@_killerImgPath" class="pt-1" width="50">
+                    <img src="@ComponentUtility.GetKillIconImagePath()" width="40">
+                    <img src="@victimImgPath" class="pt-1" width="50">
+                }
+                break;
+            case EventType.Purchase:
+                @foreach (var itemPath in _purchasedItemPaths)
+                {
+                    <img src="@itemPath" class="pt-1" width="50">
+                }
+                break;
+        }
+        <br />
+        @_eventHappenedTime
+    </div>
+    @foreach (var eventFrame in EventFrames)
+    {
+        <img style="position:absolute; left:@(GetTimeLinePosition(eventFrame))px; transform:translate(-50%, -50%); z-index:100;" src="@GetEventIconImgPath()" width="@_iconImageWidth" @onmouseover="() => ShowContents(eventFrame)" @onmouseout="HideContents">
+    }
+</div>
+
+@code
+{
+    private static readonly int _iconImageWidth = 20;
+
+    private string _show = "visually-hidden";
+    private int _eventPosition = 0;
+    private string _eventHappenedTime = "";
+
+    private string _killerImgPath = "";
+    private List<string> _victimImgPaths = new List<string>();
+
+    private List<string> _purchasedItemPaths = new List<string>();
+
+#pragma warning disable CS8618
+    [Parameter]
+    public List<ViewTimeLineEventEntity> EventFrames { get; set; }
+    [Parameter]
+    public ChampionEntity TargetChampion { get; set; }
+    [Parameter]
+    public int TimeLineBarPadding { get; set; }
+    [CascadingParameter(Name = "MatchDetailViewModel")]
+    public MatchDetailViewModel MatchDetailViewModel { get; set; }
+#pragma warning restore CS8618
+
+
+    private string GetChampionName(string participantId)
+    {
+        return MatchDetailViewModel.Match.Value.Participants.First(x => x.Id.ToString() == participantId).Champion.Name;
+    }
+
+    private int GetTimeLinePosition(ViewTimeLineEventEntity eventFrame)
+    {
+        return TimeLineUtility.GetTimeLinePosition(
+            eventFrame.TimeStamp.TotalMinutes, MatchDetailViewModel.Match.Value.Meta.GameDuration.TotalMinutes);
+    }
+
+    private string GetEventIconImgPath()
+    {
+        switch (MatchDetailViewModel.EventTypeSelected.Value)
+        {
+            case EventType.Kill:
+                return ComponentUtility.GetKillIconImagePath();
+            case EventType.Purchase:
+                return ComponentUtility.GetPurchaseIconImagePath();
+            default:
+                throw new EventTypeException();
+        }
+    }
+
+    private void ShowContents(ViewTimeLineEventEntity eventFrame)
+    {
+        _eventPosition = GetTimeLinePosition(eventFrame);
+        _eventHappenedTime = eventFrame.TimeStamp.ToString(@"mm\:ss");
+        _show = "";
+
+        switch (MatchDetailViewModel.EventTypeSelected.Value)
+        {
+            case EventType.Kill:
+                _killerImgPath = CDragon.ChampionImage.GetSquareIconPath(GetChampionName(eventFrame.Params[0]));
+                foreach (var victim in eventFrame.Params[1..])
+                {
+                    _victimImgPaths.Add(CDragon.ChampionImage.GetSquareIconPath(GetChampionName(victim)));
+                }
+                break;
+            case EventType.Purchase:
+                _purchasedItemPaths = eventFrame.Params.ConvertAll(x => CDragon.ItemImage.GetIconImage(Convert.ToInt32(x)));
+                break;
+        }
+    }
+
+    private void HideContents()
+    {
+        _show = "visually-hidden";
+        _victimImgPaths.Clear();
+        _purchasedItemPaths.Clear();
+    }
+}

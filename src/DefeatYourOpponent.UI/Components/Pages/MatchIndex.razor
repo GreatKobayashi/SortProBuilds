@@ -1,0 +1,193 @@
+﻿@page "/accounts/{PlatformStr}/{RiotId}-{TagLine}"
+@using DefeatYourOpponent.Domain.Entities
+@using DefeatYourOpponent.Domain.Exceptions
+@using DefeatYourOpponent.Domain.Logics
+@using DefeatYourOpponent.Domain.Misc
+@using DefeatYourOpponent.Domain.Repositories
+@using DefeatYourOpponent.UI.ViewModel
+@using Position = RiotApiWrapper.Misc.Position
+@rendermode @(new InteractiveServerRenderMode(false))
+@inject IApiRepository ApiRepository
+@inject IErrorMessageConverterRepository ErrorMessageConverterRepository
+@inject MatchIndexViewModel MatchIndexViewModel
+@inject NavigationManager NavigationManager
+
+<PageTitle>MatchIndex</PageTitle>
+
+<SerchForm PlatformInputted="Enum.Parse<Platform>(PlatformStr)"
+           RiotIdInputted="@RiotId"
+           TagLineInputted="@TagLine"
+           QueueTypeInputted=Queue
+           PositionInputted=Position
+           WinInputted=@Win
+           ChampionNameInputted="@Champion" />
+
+<div class="d-flex flex-column my-2">
+    <h5 class="ms-2" style="color:red;">
+        @_errorMessage
+    </h5>
+    @if (MatchIndexViewModel.MatchList.Value == null)
+    {
+        if (string.IsNullOrEmpty(_errorMessage))
+        {
+            <div class="my-3 d-flex justify-content-center">
+                <div class="spinner-border text-secondary" role="status" />
+            </div>
+        }
+    }
+    else
+    {
+        foreach (var match in MatchIndexViewModel.MatchList.Value)
+        {
+            var you = match.Participants.First(x => x.Summoner.GameName.ToLower() == RiotId.ToLower());
+            var opponent = MatchIndexViewModel.GetOpponentEntity(match, you);
+            <div class="d-flex flex-row rounded-pill @GetBackGroundColor(you.Win) my-2">
+                <img src=@CDragon.ChampionImage.GetSquareIconPath(you.Champion.Name) class="border border-3 @GetBorderColor(you.Win) rounded-circle" width="80">
+                <div class="me-2">
+                    <div class="ps-2">@match.Meta.Queue</div>
+                    <div class="ps-2 fw-bold fs-4 lh-1">@(you.Win ? "WIN" : "LOSE")</div>
+                    <div class="ps-2 lh-lg">@($"{you.Stat.ChampionKill.Kills} / {you.Stat.Deaths} / {you.Stat.Assists}")</div>
+                </div>
+                <div class="me-2">
+                    <div style="height:50%;">
+                        Rune(ToDo)
+                    </div>
+                    <div>
+                        <img src="@CDragon.SummonerSpellImage.GetIconImage(you.SummonerSpel1)" class="rounded" width="30">
+                        <img src="@CDragon.SummonerSpellImage.GetIconImage(you.SummonerSpel2)" class="rounded" width="30">
+                    </div>
+                </div>
+                <div class="align-self-center" style="width:420px;">
+                    @foreach (var itemId in you.ItemIds)
+                    {
+                        <img src=@CDragon.ItemImage.GetIconImage(itemId) class="rounded mx-1" width="50">
+                    }
+                    <img src=@CDragon.ItemImage.GetIconImage(you.WardId) class="rounded mx-1" width="50">
+                </div>
+                <button class="me-auto btn btn-primary h-50  align-self-center" @onclick="x => NavigateToMatchDetail(match.Meta.MatchId, you.Id, opponent.Id)">See Detail</button>
+                <div class="fw-bold fs-2 align-self-center">
+                    .vs&nbsp;
+                </div>
+                <img src=@CDragon.ChampionImage.GetSquareIconPath(opponent.Champion.Name) class="border border-3 @GetBorderColor(you.Win) rounded-circle" width="80">
+            </div>
+        }
+        if (MatchIndexViewModel.IsLoading.Value)
+        {
+            <div class="my-3 d-flex justify-content-center">
+                <div class="spinner-border text-secondary" role="status" />
+            </div>
+        }
+    }
+</div>
+
+@code
+{
+    private static readonly Dictionary<Platform, Region> _platformAndRegion = new()
+    {
+        { Platform.BR1,  Region.Americas },
+        { Platform.EUN1, Region.Europe },
+        { Platform.EUW1, Region.Europe },
+        { Platform.JP1,  Region.Asia },
+        { Platform.KR,   Region.Asia },
+        { Platform.LA1,  Region.Americas },
+        { Platform.LA2,  Region.Americas },
+        { Platform.NA1,  Region.Americas },
+        { Platform.OC1,  Region.SEA },
+        { Platform.PH2,  Region.SEA },
+        { Platform.RU,   Region.Europe },
+        { Platform.SG2,  Region.SEA },
+        { Platform.TH2,  Region.SEA },
+        { Platform.TR1,  Region.Europe },
+        { Platform.TW2,  Region.SEA },
+        { Platform.VN2,  Region.SEA }
+    };
+
+    private Region _region => _platformAndRegion[Enum.Parse<Platform>(PlatformStr)];
+
+#pragma warning disable CS8618
+    [Parameter]
+    public string PlatformStr { get; set; }
+    [Parameter]
+    public string RiotId { get; set; }
+    [Parameter]
+    public string TagLine { get; set; }
+
+    [SupplyParameterFromQuery]
+    public int? Position { get; set; }
+    [SupplyParameterFromQuery]
+    public int? Queue { get; set; }
+    [SupplyParameterFromQuery]
+    public bool? Win { get; set; }
+    [SupplyParameterFromQuery]
+    public string? Champion { get; set; }
+#pragma warning restore CS8618
+
+    private string _errorMessage = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        MatchIndexViewModel.MatchList.Subscribe(x => InvokeAsync(StateHasChanged));
+        MatchIndexViewModel.IsLoading.Subscribe(x => InvokeAsync(StateHasChanged));
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _errorMessage = string.Empty;
+            try
+            {
+                await MatchIndexViewModel.GetMatchEntitiesByRiotIdAsync(
+                    _region, RiotId, TagLine, new()
+                        {
+                            Champion = (string.IsNullOrEmpty(Champion) ? null : CDragon.ChampionJson.GetEntity(Champion)),
+                            Position = (Position == null ? null : (Position)Position),
+                            QueueType = (Queue == null ? null : (QueueType)Queue)
+                        }, 10);
+            }
+            catch (InternalException exception)
+            {
+                _errorMessage = ErrorMessageConverterRepository.GetMessage(Language.JP, exception);
+                StateHasChanged();
+            }
+            catch (RiotApiException exception)
+            {
+                _errorMessage = ErrorMessageConverterRepository.GetMessage(Language.JP, exception);
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
+    }
+
+    private void NavigateToMatchDetail(string matchId, int yourId, int opponentId)
+    {
+        NavigationManager.NavigateTo($"/matches/{_region}/{matchId}?YourId={yourId}&OpponentId={opponentId}");
+    }
+
+    private string GetBackGroundColor(bool win)
+    {
+        if (win)
+        {
+            return "bg-info-subtle";
+        }
+        else
+        {
+            return "bg-danger-subtle";
+        }
+    }
+
+    private string GetBorderColor(bool win)
+    {
+        if (win)
+        {
+            return "border-primary";
+        }
+        else
+        {
+            return "border-danger";
+        }
+    }
+}
