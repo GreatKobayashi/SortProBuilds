@@ -1,5 +1,6 @@
 ﻿using DefeatYourOpponent.Domain.Entities;
 using DefeatYourOpponent.Domain.Repositories;
+using DefeatYourOpponent.Infrastructure.AesDec;
 using DefeatYourOpponent.Infrastructure.Json;
 using DefeatYourOpponent.Infrastructure.WebApi;
 
@@ -21,6 +22,11 @@ namespace DefeatYourOpponent.Infrastructure
             string riotApiErrorMessagelistFilePath, string internalErrorMessagelistFilePath)
         {
             return new ErrorMessageConverterJson(riotApiErrorMessagelistFilePath, internalErrorMessagelistFilePath);
+        }
+
+        public static IApiKeyRepository CreateApiKeyRepository(string apiKeyFilePath)
+        {
+            return new ApiKeyAes(apiKeyFilePath);
         }
     }
 }

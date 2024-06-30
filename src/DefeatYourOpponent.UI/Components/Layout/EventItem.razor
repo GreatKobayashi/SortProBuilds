@@ -13,15 +13,15 @@
             case EventType.Kill:
                 @foreach (var victimImgPath in _victimImgPaths)
                 {
-                    <img src="@_killerImgPath" class="pt-1" width="50">
-                    <img src="@ComponentUtility.GetKillIconImagePath()" width="40">
-                    <img src="@victimImgPath" class="pt-1" width="50">
+                    <img src="@_killerImgPath" class="pt-1" width="@_championImageWidth">
+                    <img src="@ComponentUtility.GetKillIconImagePath()" width="@Shared.SettingEntity.MatchDetailViewSetting.KillIconWidth">
+                    <img src="@victimImgPath" class="pt-1" width="@_championImageWidth">
                 }
                 break;
             case EventType.Purchase:
                 @foreach (var itemPath in _purchasedItemPaths)
                 {
-                    <img src="@itemPath" class="pt-1" width="50">
+                    <img src="@itemPath" class="pt-1" width="@_championImageWidth">
                 }
                 break;
         }
@@ -36,7 +36,8 @@
 
 @code
 {
-    private static readonly int _iconImageWidth = 20;
+    private static readonly int _championImageWidth = Shared.SettingEntity.MatchDetailViewSetting.EventItemImageWidth;
+    private static readonly int _iconImageWidth = Shared.SettingEntity.MatchDetailViewSetting.EventIconWidth;
 
     private string _show = "visually-hidden";
     private int _eventPosition = 0;

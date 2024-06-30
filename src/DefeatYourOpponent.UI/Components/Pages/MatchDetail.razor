@@ -16,11 +16,11 @@
     @if (MatchDetailViewModel.YourChampion != null && MatchDetailViewModel.OpponentChampion != null && MatchDetailViewModel.IsInitialized)
     {
         <div class="col-auto">
-            <img src=@CDragon.ChampionImage.GetSquareIconPath(MatchDetailViewModel.YourChampion.Id) class="rounded-circle" width="200">
+            <img src=@CDragon.ChampionImage.GetSquareIconPath(MatchDetailViewModel.YourChampion.Id) class="rounded-circle" width="@_championImageWidth">
         </div>
         <div class="col-auto d-flex justify-content-center align-items-center p-3"><h2>vs.</h2></div>
         <div class="col-auto">
-            <img src=@CDragon.ChampionImage.GetSquareIconPath(MatchDetailViewModel.OpponentChampion.Id) class="rounded-circle" width="200">
+            <img src=@CDragon.ChampionImage.GetSquareIconPath(MatchDetailViewModel.OpponentChampion.Id) class="rounded-circle" width="@_championImageWidth">
         </div>
     }
     else
@@ -59,6 +59,8 @@
 
 @code
 {
+    private static readonly int _championImageWidth = Shared.SettingEntity.MatchDetailViewSetting.TitleChampionImageWidth;
+
     private Chart? _chart;
 
     private LineConfig _config = new LineConfig()

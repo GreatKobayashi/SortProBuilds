@@ -3,9 +3,7 @@ using DefeatYourOpponent.Domain.Misc;
 using DefeatYourOpponent.Domain.Repositories;
 using Reactive.Bindings;
 using RiotApiWrapper.Entities;
-using RiotApiWrapper.Entities.Match.MatchTimeLine.Events;
 using RiotApiWrapper.Misc;
-using System;
 
 namespace DefeatYourOpponent.UI.ViewModel
 {

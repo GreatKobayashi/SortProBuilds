@@ -4,7 +4,6 @@ using DefeatYourOpponent.Domain.Repositories;
 using Reactive.Bindings;
 using RiotApiWrapper.Entities;
 using RiotApiWrapper.Entities.Match;
-using RiotApiWrapper.Exceptions;
 using RiotApiWrapper.Misc;
 
 namespace DefeatYourOpponent.UI.ViewModel

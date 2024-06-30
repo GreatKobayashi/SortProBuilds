@@ -7,7 +7,6 @@ using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
@@ -18,7 +17,8 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 
 Shared.SettingEntity = Factories.CreateSettingFileRepository().GetEntity();
 
-var apiKey = "RGAPI-a802e21f-6407-4722-b20a-00e6dae736d8";
+var apiKeyRepository = Factories.CreateApiKeyRepository(Shared.SettingEntity.ApiKeyFilePath);
+var apiKey = await apiKeyRepository.GetApiKey();
 
 builder.Services.AddSingleton(Factories.CreateApiRepository(apiKey));
 builder.Services.AddSingleton(

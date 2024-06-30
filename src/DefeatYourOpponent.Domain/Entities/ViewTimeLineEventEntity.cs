@@ -1,6 +1,4 @@
-﻿using DefeatYourOpponent.Domain.Misc;
-
-namespace DefeatYourOpponent.Domain.Entities
+﻿namespace DefeatYourOpponent.Domain.Entities
 {
     public class ViewTimeLineEventEntity
     {

@@ -1,4 +1,5 @@
 ﻿@page "/accounts/{PlatformStr}/{RiotId}-{TagLine}"
+@using DefeatYourOpponent.Domain
 @using DefeatYourOpponent.Domain.Entities
 @using DefeatYourOpponent.Domain.Exceptions
 @using DefeatYourOpponent.Domain.Logics
@@ -42,7 +43,7 @@
             var you = match.Participants.First(x => x.Summoner.GameName.ToLower() == RiotId.ToLower());
             var opponent = MatchIndexViewModel.GetOpponentEntity(match, you);
             <div class="d-flex flex-row rounded-pill @GetBackGroundColor(you.Win) my-2">
-                <img src=@CDragon.ChampionImage.GetSquareIconPath(you.Champion.Name) class="border border-3 @GetBorderColor(you.Win) rounded-circle" width="80">
+                <img src=@CDragon.ChampionImage.GetSquareIconPath(you.Champion.Name) class="border border-3 @GetBorderColor(you.Win) rounded-circle" width="@_championImageWidth">
                 <div class="me-2">
                     <div class="ps-2">@match.Meta.Queue</div>
                     <div class="ps-2 fw-bold fs-4 lh-1">@(you.Win ? "WIN" : "LOSE")</div>
@@ -53,22 +54,22 @@
                         Rune(ToDo)
                     </div>
                     <div>
-                        <img src="@CDragon.SummonerSpellImage.GetIconImage(you.SummonerSpel1)" class="rounded" width="30">
-                        <img src="@CDragon.SummonerSpellImage.GetIconImage(you.SummonerSpel2)" class="rounded" width="30">
+                        <img src="@CDragon.SummonerSpellImage.GetIconImage(you.SummonerSpel1)" class="rounded" width="@_summonerSpellImageWidth">
+                        <img src="@CDragon.SummonerSpellImage.GetIconImage(you.SummonerSpel2)" class="rounded" width="@_summonerSpellImageWidth">
                     </div>
                 </div>
                 <div class="align-self-center" style="width:420px;">
                     @foreach (var itemId in you.ItemIds)
                     {
-                        <img src=@CDragon.ItemImage.GetIconImage(itemId) class="rounded mx-1" width="50">
+                        <img src=@CDragon.ItemImage.GetIconImage(itemId) class="rounded mx-1" width="@_itemImageWidth">
                     }
-                    <img src=@CDragon.ItemImage.GetIconImage(you.WardId) class="rounded mx-1" width="50">
+                    <img src=@CDragon.ItemImage.GetIconImage(you.WardId) class="rounded mx-1" width="@_itemImageWidth">
                 </div>
                 <button class="me-auto btn btn-primary h-50  align-self-center" @onclick="x => NavigateToMatchDetail(match.Meta.MatchId, you.Id, opponent.Id)">See Detail</button>
                 <div class="fw-bold fs-2 align-self-center">
                     .vs&nbsp;
                 </div>
-                <img src=@CDragon.ChampionImage.GetSquareIconPath(opponent.Champion.Name) class="border border-3 @GetBorderColor(you.Win) rounded-circle" width="80">
+                <img src=@CDragon.ChampionImage.GetSquareIconPath(opponent.Champion.Name) class="border border-3 @GetBorderColor(you.Win) rounded-circle" width="@_championImageWidth">
             </div>
         }
         if (MatchIndexViewModel.IsLoading.Value)
@@ -82,6 +83,10 @@
 
 @code
 {
+    private static readonly int _summonerSpellImageWidth = Shared.SettingEntity.MatchIndexViewSetting.SummonerSpellImageWidth;
+    private static readonly int _championImageWidth = Shared.SettingEntity.MatchIndexViewSetting.ChampionImageWidth;
+    private static readonly int _itemImageWidth = Shared.SettingEntity.MatchIndexViewSetting.ItemImageWidth;
+
     private static readonly Dictionary<Platform, Region> _platformAndRegion = new()
     {
         { Platform.BR1,  Region.Americas },
