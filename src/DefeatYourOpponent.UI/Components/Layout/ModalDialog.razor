@@ -1,0 +1,49 @@
+﻿@inject IJSRuntime JSRuntime;
+
+<div class="modal fade" id="modalDialog" tabindex="-1" aria-labelledby="modalDialogLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="modalDialogLabel">@Title</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @Message
+            </div>
+            <div class="modal-footer">
+                @if (!string.IsNullOrEmpty(CancelButtonLabel))
+                {
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@CancelButtonLabel</button>
+                }
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @onclick="OnOkButtonPushed">@OkButtonLabel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = "Dialog title";
+
+    [Parameter]
+    public string Message { get; set; } = "Message";
+
+    [Parameter]
+    public string OkButtonLabel { get; set; } = "OK";
+
+    [Parameter]
+    public string? CancelButtonLabel { get; set; }
+
+    [Parameter]
+    public EventCallback Action { get; set; }
+
+    public async Task Show()
+    {
+        await JSRuntime.InvokeVoidAsync("showModal");
+    }
+
+    private async Task OnOkButtonPushed()
+    {
+        await Action.InvokeAsync();
+    }
+}
