@@ -36,6 +36,11 @@
                 dataset.backgroundColor = gradient;
             }
         }
+        window.showModal = () => {
+            let divModal = document.getElementById('modalDialog');
+            let modal = new bootstrap.Modal(divModal);
+            modal.show();
+        }
     </script>
 </body>
 

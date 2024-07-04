@@ -1,4 +1,7 @@
-﻿<nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+﻿@rendermode @(new InteractiveServerRenderMode(false))
+@inject NavigationManager NavigationManager
+
+<nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">DefeatYourOpponent.GG</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -9,15 +12,42 @@
                 <li class="nav-item">
                 </li>
             </ul>
-            <div class="d-flex">
+            <a class="d-flex" role="button" @onclick="OnGithubButtonPush">
                 <i class="align-self-center bi bi-github text-white mx-2 mb-2" style="font-size:1.5em;"></i>
-            </div>
-            <div class="d-flex">
+            </a>
+            <a class="d-flex" role="button" @onclick="() => OnNotImplementedButtonPushed(_contact)">
                 <i class="bi bi-chat-dots text-white mx-2 mb-2" style="font-size:1.5em;" />
-            </div>
-            <div class="d-flex">
+            </a>
+            <a class="d-flex" role="button" @onclick="() => OnNotImplementedButtonPushed(_translation)">
                 <i class="bi bi-translate text-white mx-2 mb-2" style="font-size:1.5em;"></i>
-            </div>
+            </a>
         </div>
     </div>
 </nav>
+
+<ModalDialog @ref="_dialog"
+             Title="@_dialogTitle"
+             Message="Sorry, but not implemented now."
+             OkButtonLabel="OK" />
+
+@code {
+    
+    private static readonly string _contact = "Contact me";
+    private static readonly string _translation = "Translation";
+
+#pragma warning disable CS8618
+    private ModalDialog _dialog;
+#pragma warning restore CS8618
+    private string _dialogTitle = "";
+
+    private void OnGithubButtonPush()
+    {
+        NavigationManager.NavigateTo("https://github.com/GreatKobayashi/DefeatYourOpponent/tree/develop/beta");
+    }
+
+    private async void OnNotImplementedButtonPushed(string functionName)
+    {
+        _dialogTitle = functionName;
+        await _dialog.Show();
+    }
+}
