@@ -9,5 +9,6 @@ namespace DefeatYourOpponent.Domain
         [JsonInclude]
         public static SettingEntity SettingEntity { get; set; }
 #pragma warning restore CS8618
+        public static string ModalDialogId { get; } = "modalDialog";
     }
 }

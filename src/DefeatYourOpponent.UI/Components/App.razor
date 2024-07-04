@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using DefeatYourOpponent.Domain
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -37,7 +38,7 @@
             }
         }
         window.showModal = () => {
-            let divModal = document.getElementById('modalDialog');
+            let divModal = document.getElementById(`@Shared.ModalDialogId`);
             let modal = new bootstrap.Modal(divModal);
             modal.show();
         }
