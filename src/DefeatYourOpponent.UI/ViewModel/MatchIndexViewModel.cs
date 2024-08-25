@@ -32,19 +32,9 @@ namespace DefeatYourOpponent.UI.ViewModel
             {
                 MatchList.Value = await _apiRepository.GetMatchesAsync(region, riotId, tagLine, serchTag, count);
 
-                var offset = count;
-                while (MatchList.Value.Count < count)
+                if (MatchList.Value.Count < count)
                 {
-                    var shortageCount = count - MatchList.Value.Count;
-                    var additional = await _apiRepository.GetMatchesAsync(region, riotId, tagLine, serchTag, shortageCount, offset);
-                    var temp = new List<MatchEntity>(MatchList.Value);
-                    temp.AddRange(additional);
-                    MatchList.Value = temp;
-                    offset += shortageCount;
-                    if (offset > 50)
-                    {
-                        throw new InternalException("該当マッチ数不足");
-                    }
+                    throw new InternalException("該当マッチ数不足");
                 }
             }
             finally

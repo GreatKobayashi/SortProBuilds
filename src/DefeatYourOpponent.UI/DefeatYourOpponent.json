@@ -1,7 +1,7 @@
 {
   "RiotApiErrorMessageListFilePath": "RiotApiErrorMessageList.json",
   "InternalErrorMessageListFilePath": "InternalErrorMessageList.json",
-  "ApiKeyFilePath": "DevelopmentKey.aes",
+  "ApiKeyFilePath": "ProductApiKey.aes",
   "KillIconWidth": 35,
   "AssistChampionImageWidth": 35,
   "ChartWidth": 1000,

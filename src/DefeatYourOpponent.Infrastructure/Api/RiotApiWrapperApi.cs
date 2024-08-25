@@ -8,6 +8,7 @@ namespace DefeatYourOpponent.Infrastructure.WebApi
 {
     public class RiotApiWrapperApi : IApiRepository
     {
+        private static readonly int _maxMatchCount = 100;
         private RiotApi _riotApi;
 
         public RiotApiWrapperApi(string apiKey)
@@ -23,30 +24,32 @@ namespace DefeatYourOpponent.Infrastructure.WebApi
         public async Task<List<MatchEntity>> GetMatchesAsync(Region region, string riotId, string tagLine, SerchTagEntity tags, int count, int startOffset = 0)
         {
             var account = await _riotApi.Account.GetByGameIdAsync(region, riotId, tagLine);
-            var matchIdList = await _riotApi.Match.GetIdListAsync(region, account.PuuId, null, null, null, startOffset, count);
+            var matchIdList = await _riotApi.Match.GetIdListAsync(region, account.PuuId, null, null, null, startOffset, _maxMatchCount);
 
             var matchInfoList = new List<MatchEntity>();
             foreach (var matchId in matchIdList)
             {
-                var match = await _riotApi.Match.GetInfoAsync(region, matchId);
-                var target = match.Participants.First(x => x.Summoner.GameName == riotId);
-                if (tags.Champion != null && target.Champion.Id != tags.Champion.Id)
+                try
                 {
-                    continue;
+                    var match = await _riotApi.Match.GetInfoAsync(region, matchId);
+                    var target = match.Participants.First(x => x.Summoner.GameName == riotId);
+                    if ((tags.Champion != null && target.Champion.Id != tags.Champion.Id)
+                        || (tags.Win != null && target.Win != tags.Win)
+                        || (tags.Position != null && target.Position != tags.Position)
+                        || (tags.QueueType != null && match.Meta.Queue != tags.QueueType))
+                    {
+                        continue;
+                    }
+                    matchInfoList.Add(match);
+                    if (matchInfoList.Count == count)
+                    {
+                        break;
+                    }
                 }
-                if (tags.Win != null && target.Win != tags.Win)
+                catch { }
+                finally
                 {
-                    continue;
                 }
-                if (tags.Position != null && target.Position != tags.Position)
-                {
-                    continue;
-                }
-                if (tags.QueueType != null && match.Meta.Queue != tags.QueueType)
-                {
-                    continue;
-                }
-                matchInfoList.Add(match);
             }
 
             return matchInfoList;
